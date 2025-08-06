@@ -1,25 +1,94 @@
 from coloraide import Color
+import re
 import sublime
 import sublime_plugin
 
 
+HEX_COLOR_RE = re.compile(r'#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})')
+
+
 def get_cursor_color(view, region):
-    point = region.begin()
-    visible = view.visible_region()
-    start = point - 50
-    end = point + 50
-    if start < visible.begin():
-        start = visible.begin()
-    if end > visible.end():
-        end = visible.end()
-    bfr = view.substr(sublime.Region(start, end))
-    ref = point - start
-    print(ref, bfr)
-    # for m in util.COLOR_RE.finditer(bfr):
-    #     if ref >= m.start(0) and ref < m.end(0):
-    #         color, alpha, alpha_dec = util.translate_color(m, argb)
-    #         break
-    # return color, alpha, alpha_dec
+    # get_cursor_color from ColorHints takes a large region (+/- 50) around the cursor
+    # then applies a complex regex that will actually look for all kinds of patterns
+    # ... let's try for something more elegant
+
+    # First handle colors that are words: names and hex
+    # Get the word under the cursor
+    word_region = view.word(region)
+
+    # If the word is preceded by a #, include it in the word
+    if region.a > 0 and view.substr(sublime.Region(word_region.a - 1, word_region.a)) == '#':
+        word_region = sublime.Region(word_region.a - 1, word_region.b)
+
+    return view.substr(word_region)
+
+
+def convert(color, format):
+    """ Convert a Color to a target format """
+    settings = sublime.load_settings('ColorConvertor.sublime-settings')
+    print('---------')
+    print('output:')
+    if format == 'name':
+        print(color.to_string(names=True))
+        return
+
+    if format == 'rgb':
+        print(color.to_string(
+            comma=settings.get('commas'),
+            color=settings.get('color()')
+        ))
+        return
+
+    if format == 'rgba':
+        print(color.to_string(
+            alpha=True,
+            comma=settings.get('commas'),
+            color=settings.get('color()')
+        ))
+        return
+
+    if format == 'hex':
+        print(color.to_string(
+            hex=True,
+            upper=settings.get('hex_case') == 'upper',
+            compress=settings.get('hex_short'),
+        ))
+        return
+
+    if format == 'hexa':
+        print(color.to_string(
+            alpha=True,
+            hex=True,
+            upper=settings.get('hex_case') == 'upper',
+            compress=settings.get('hex_short'),
+        ))
+        return
+
+    common_args = dict(
+        comma=settings.get('commas'),
+        percent=settings.get('%'),
+        color=settings.get('color()')
+    )
+
+    if format == 'hsl':
+        color.convert('hsl', in_place=True)
+        print(color.to_string(**common_args))
+        return
+
+    if format == 'hsla':
+        color.convert('hsl', in_place=True)
+        print(color.to_string(alpha=True, **common_args))
+        return
+
+    if format == 'lab':
+        color.convert('lab', in_place=True)
+        print(color.to_string(**common_args))
+        return
+
+    if format == 'laba':
+        color.convert('lab', in_place=True)
+        print(color.to_string(alpha=True, **common_args))
+        return
 
 
 class ColorConvert(sublime_plugin.TextCommand):
@@ -28,73 +97,9 @@ class ColorConvert(sublime_plugin.TextCommand):
         self.view = view
 
     def run(self, edit, format='rgb'):
-        settings = sublime.load_settings('ColorConvertor.sublime-settings')
-        c = Color("rebeccapurple")
-
         sels = self.view.sel()
         for sel in sels:
-            get_cursor_color(self.view, sel)
-
-        print('---------')
-        print('output:')
-        if format == 'name':
-            print(c.to_string(names=True))
-            return
-
-        if format == 'rgb':
-            print(c.to_string(
-                comma=settings.get('commas'),
-                color=settings.get('color()')
-            ))
-            return
-
-        if format == 'rgba':
-            print(c.to_string(
-                alpha=True,
-                comma=settings.get('commas'),
-                color=settings.get('color()')
-            ))
-            return
-
-        if format == 'hex':
-            print(c.to_string(
-                hex=True,
-                upper=settings.get('hex_case') == 'upper',
-                compress=settings.get('hex_short'),
-            ))
-            return
-
-        if format == 'hexa':
-            print(c.to_string(
-                alpha=True,
-                hex=True,
-                upper=settings.get('hex_case') == 'upper',
-                compress=settings.get('hex_short'),
-            ))
-            return
-
-        common_args = dict(
-            comma=settings.get('commas'),
-            percent=settings.get('%'),
-            color=settings.get('color()')
-        )
-
-        if format == 'hsl':
-            c.convert('hsl', in_place=True)
-            print(c.to_string(**common_args))
-            return
-
-        if format == 'hsla':
-            c.convert('hsl', in_place=True)
-            print(c.to_string(alpha=True, **common_args))
-            return
-
-        if format == 'lab':
-            c.convert('lab', in_place=True)
-            print(c.to_string(**common_args))
-            return
-
-        if format == 'laba':
-            c.convert('lab', in_place=True)
-            print(c.to_string(alpha=True, **common_args))
-            return
+            source = get_cursor_color(self.view, sel)
+            print('source:', source)
+            color = Color(source)
+            convert(color, format)
