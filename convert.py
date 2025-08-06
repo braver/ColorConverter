@@ -101,5 +101,8 @@ class ColorConvert(sublime_plugin.TextCommand):
         for sel in sels:
             source = get_cursor_color(self.view, sel)
             print('source:', source)
-            color = Color(source)
-            convert(color, format)
+            try:
+                color = Color(source)
+                convert(color, format)
+            except Exception:
+                sublime.status_message('This is not a color')
