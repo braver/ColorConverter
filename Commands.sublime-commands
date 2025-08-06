@@ -1,0 +1,17 @@
+[
+    {
+        "caption": "ColorConvertor: Convert to HEX",
+        "command": "color_convert",
+        "args": { "format": "hex" }
+    },
+    {
+        "caption": "ColorConvertor: Convert to RGB",
+        "command": "color_convert",
+        "args": { "format": "rgb" }
+    },
+    {
+        "caption": "ColorConvertor: Convert to name",
+        "command": "color_convert",
+        "args": { "format": "name" }
+    }
+]
