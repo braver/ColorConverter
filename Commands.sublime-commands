@@ -1,8 +1,18 @@
 [
     {
+        "caption": "ColorConvertor: Convert to name",
+        "command": "color_convert",
+        "args": { "format": "name" }
+    },
+    {
         "caption": "ColorConvertor: Convert to HEX",
         "command": "color_convert",
         "args": { "format": "hex" }
+    },
+    {
+        "caption": "ColorConvertor: Convert to HEX with alpha",
+        "command": "color_convert",
+        "args": { "format": "hexa" }
     },
     {
         "caption": "ColorConvertor: Convert to RGB",
@@ -10,8 +20,28 @@
         "args": { "format": "rgb" }
     },
     {
-        "caption": "ColorConvertor: Convert to name",
+        "caption": "ColorConvertor: Convert to RGB with alpha",
         "command": "color_convert",
-        "args": { "format": "name" }
+        "args": { "format": "rgba" }
+    },
+    {
+        "caption": "ColorConvertor: Convert to HSL",
+        "command": "color_convert",
+        "args": { "format": "hsl" }
+    },
+    {
+        "caption": "ColorConvertor: Convert to HSL with alpha",
+        "command": "color_convert",
+        "args": { "format": "hsla" }
+    },
+    {
+        "caption": "ColorConvertor: Convert to LAB",
+        "command": "color_convert",
+        "args": { "format": "lab" }
+    },
+    {
+        "caption": "ColorConvertor: Convert to LAB with alpha",
+        "command": "color_convert",
+        "args": { "format": "laba" }
     }
 ]

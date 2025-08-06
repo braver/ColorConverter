@@ -7,16 +7,66 @@ class ColorConvert(sublime_plugin.TextCommand):
 
     def run(self, edit, format='rgb'):
         settings = sublime.load_settings('ColorConvertor.sublime-settings')
-        c = Color("red")
+        c = Color("rebeccapurple")
 
         if format == 'name':
             print(c.to_string(names=True))
             return
 
-        want_hex = format == 'hex'
-        print(c.to_string(
+        if format == 'rgb':
+            print(c.to_string(
+                comma=settings.get('commas'),
+                color=settings.get('color()')
+            ))
+            return
+
+        if format == 'rgba':
+            print(c.to_string(
+                alpha=True,
+                comma=settings.get('commas'),
+                color=settings.get('color()')
+            ))
+            return
+
+        if format == 'hex':
+            print(c.to_string(
+                hex=True,
+                upper=settings.get('hex_case') == 'upper',
+                compress=settings.get('hex_short'),
+            ))
+            return
+
+        if format == 'hexa':
+            print(c.to_string(
+                alpha=True,
+                hex=True,
+                upper=settings.get('hex_case') == 'upper',
+                compress=settings.get('hex_short'),
+            ))
+            return
+
+        common_args = dict(
             comma=settings.get('commas'),
-            upper=settings.get('hex_case') == "upper" and want_hex,
-            compress=settings.get('hex_short') and want_hex,
-            hex=want_hex,
-        ))
+            percent=settings.get('%'),
+            color=settings.get('color()')
+        )
+
+        if format == 'hsl':
+            c.convert('hsl', in_place=True)
+            print(c.to_string(**common_args))
+            return
+
+        if format == 'hsla':
+            c.convert('hsl', in_place=True)
+            print(c.to_string(alpha=True, **common_args))
+            return
+
+        if format == 'lab':
+            c.convert('lab', in_place=True)
+            print(c.to_string(**common_args))
+            return
+
+        if format == 'laba':
+            c.convert('lab', in_place=True)
+            print(c.to_string(alpha=True, **common_args))
+            return
