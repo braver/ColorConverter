@@ -4,7 +4,12 @@ import sublime
 import sublime_plugin
 
 
-HEX_COLOR_RE = re.compile(r'#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})')
+# without the first #
+HEX_COLOR_RE = re.compile(r'([a-f0-9]{6}|[a-f0-9]{3})')
+
+
+def extract_word(view, region):
+    return view.substr(region).lower()
 
 
 def get_cursor_color(view, region):
@@ -16,11 +21,13 @@ def get_cursor_color(view, region):
     # Get the word under the cursor
     word_region = view.word(region)
 
-    # If the word is preceded by a #, include it in the word
-    if region.a > 0 and view.substr(sublime.Region(word_region.a - 1, word_region.a)) == '#':
-        word_region = sublime.Region(word_region.a - 1, word_region.b)
+    word = extract_word(view, word_region)
+    # If the word looks like a hex and is preceded by a #, include it in the word
+    if HEX_COLOR_RE.match(word):
+        if region.a > 0 and view.substr(sublime.Region(word_region.a - 1, word_region.a)) == '#':
+            word_region = sublime.Region(word_region.a - 1, word_region.b)
 
-    return view.substr(word_region)
+    return extract_word(view, word_region)
 
 
 def convert(color, format):
