@@ -37,9 +37,9 @@ def get_cursor_color(view, region):
 def convert(color, format):
     """ Convert a Color to a target format """
     settings = sublime.load_settings('ColorConvertor.sublime-settings')
-    print('---------')
-    print('output:')
+
     if format == 'name':
+        # caveat: if the color has no name, it will fall back to rgb() probably
         return color.to_string(names=True)
 
     if format == 'rgb':
