@@ -4,8 +4,51 @@ import sublime
 import sublime_plugin
 
 
-# without the first #
-HEX_COLOR_RE = re.compile(r'([a-f0-9]{6}|[a-f0-9]{3})')
+# hex color, but without the first #
+HEX_COLOR_RE = re.compile(r'([a-f0-9]{6}|[a-f0-9]{3})', re.IGNORECASE)
+
+RGB_COLOR_RE = re.compile(
+    r'rgb\s*\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)',
+    re.IGNORECASE
+)
+
+# maybe? (rgba?|hsla?)\([^)]+\)
+""" test set:
+rgb(255 255 255)
+rgb(255 255 255 / 50%)
+rgba(0 255 255)
+rgb(0, 255, 255)
+rgb(0, 255, 255, 50%)
+hsl(120deg 75% 25%)
+hsl(120 75 25)
+hsl(120deg 75% 25% / 60%)
+hsl(none 75% 25%)
+hsl(from green h s l / 0.5)
+hsl(from #0000FF h s calc(l + 20))
+hsl(from rgb(200 0 0) calc(h + 30) s calc(l + 30))
+hsla(120deg 75% 25% / 60%)
+hsl(120, 75%, 25%)
+hsl(120deg, 75%, 25%, 0.8)
+"""
+
+
+def find_rgb_color_at_region(view, region):
+    # Expand to a reasonable range around the cursor (e.g., line, or +/–30 chars)
+    line_region = view.line(region)
+    line_text = view.substr(line_region)
+
+    # Adjust the region's offset relative to the line
+    offset = region.a - line_region.a
+
+    # Search all rgb() in the line, and see if the cursor is inside one
+    for match in RGB_COLOR_RE.finditer(line_text):
+        match_start, match_end = match.span()
+        if match_start <= offset <= match_end:
+            # Found the rgb() the cursor is inside
+            rgb_region = sublime.Region(line_region.a + match_start, line_region.a + match_end)
+            rgb_string = view.substr(rgb_region)
+            return rgb_region, rgb_string
+    return None, None
 
 
 def extract_word(view, region):
@@ -19,7 +62,7 @@ def get_cursor_color(view, region):
 
     # get_cursor_color from ColorHints takes a large region (+/- 50) around the cursor
     # then applies a complex regex that will actually look for all kinds of patterns
-    # ... let's try for something more elegant
+    # ... let's try for something more elegant, like handling one pattern at a time
 
     # First handle colors that are words: names and hex
     # Get the word under the cursor
