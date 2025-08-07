@@ -13,6 +13,10 @@ def extract_word(view, region):
 
 
 def get_cursor_color(view, region):
+    """ Find the color string around the given region,
+        then return the exact region of that string, and the string itself
+    """
+
     # get_cursor_color from ColorHints takes a large region (+/- 50) around the cursor
     # then applies a complex regex that will actually look for all kinds of patterns
     # ... let's try for something more elegant
@@ -27,7 +31,7 @@ def get_cursor_color(view, region):
         if region.a > 0 and view.substr(sublime.Region(word_region.a - 1, word_region.a)) == '#':
             word_region = sublime.Region(word_region.a - 1, word_region.b)
 
-    return extract_word(view, word_region)
+    return (word_region, extract_word(view, word_region))
 
 
 def convert(color, format):
@@ -36,40 +40,35 @@ def convert(color, format):
     print('---------')
     print('output:')
     if format == 'name':
-        print(color.to_string(names=True))
-        return
+        return color.to_string(names=True)
 
     if format == 'rgb':
-        print(color.to_string(
+        return color.to_string(
             comma=settings.get('commas'),
             color=settings.get('color()')
-        ))
-        return
+        )
 
     if format == 'rgba':
-        print(color.to_string(
+        return color.to_string(
             alpha=True,
             comma=settings.get('commas'),
             color=settings.get('color()')
-        ))
-        return
+        )
 
     if format == 'hex':
-        print(color.to_string(
+        return color.to_string(
             hex=True,
             upper=settings.get('hex_case') == 'upper',
             compress=settings.get('hex_short'),
-        ))
-        return
+        )
 
     if format == 'hexa':
-        print(color.to_string(
+        return color.to_string(
             alpha=True,
             hex=True,
             upper=settings.get('hex_case') == 'upper',
             compress=settings.get('hex_short'),
-        ))
-        return
+        )
 
     common_args = dict(
         comma=settings.get('commas'),
@@ -79,23 +78,19 @@ def convert(color, format):
 
     if format == 'hsl':
         color.convert('hsl', in_place=True)
-        print(color.to_string(**common_args))
-        return
+        return color.to_string(**common_args)
 
     if format == 'hsla':
         color.convert('hsl', in_place=True)
-        print(color.to_string(alpha=True, **common_args))
-        return
+        return color.to_string(alpha=True, **common_args)
 
     if format == 'lab':
         color.convert('lab', in_place=True)
-        print(color.to_string(**common_args))
-        return
+        return color.to_string(**common_args)
 
     if format == 'laba':
         color.convert('lab', in_place=True)
-        print(color.to_string(alpha=True, **common_args))
-        return
+        return color.to_string(alpha=True, **common_args)
 
 
 class ColorConvert(sublime_plugin.TextCommand):
@@ -107,9 +102,10 @@ class ColorConvert(sublime_plugin.TextCommand):
         sels = self.view.sel()
         for sel in sels:
             source = get_cursor_color(self.view, sel)
-            print('source:', source)
+
             try:
-                color = Color(source)
-                convert(color, format)
+                color = Color(source[1])
+                result = convert(color, format)
+                self.view.replace(edit, source[0], result)
             except Exception:
-                sublime.status_message('This is not a color')
+                sublime.status_message('That does not seem to be a color')
