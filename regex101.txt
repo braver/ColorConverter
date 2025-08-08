@@ -1,0 +1,21 @@
+hsla?\((?P<angle>\d+)(deg)?,?\s*(?P<sat>\d+)%?,?\s*(?P<light>\d+)%?(\s*(,|\/)?\s*(?P<opacity>\d+)%?)
+
+probably just ignore relative "from green" syntax, that doesn't work elsewhere either
+
+/* Absolute values */
+hsl(120deg 75% 25%)
+hsl(120 75 25) /* deg and % units are optional */
+hsl(120deg 75% 25% / 60%)
+hsl(none 75% 25%)
+
+/* Relative values */
+hsl(from green h s l / 0.5)
+hsl(from #0000FF h s calc(l + 20))
+hsl(from rgb(200 0 0) calc(h + 30) s calc(l + 30))
+
+/* Legacy 'hsla()' alias */
+hsla(120deg 75% 25% / 60%)
+
+/* Legacy format */
+hsl(120, 75%, 25%)
+hsl(120deg, 75%, 25%, 0.8)

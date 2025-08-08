@@ -47,7 +47,7 @@ def get_cursor_color(view, region):
     # first try to find rgb() like color function colors
     rgb = find_rgb_color_at_region(view, region)
     if rgb is not None:
-        print(rgb)
+        print(rgb[1])
         return rgb
 
     # otherwise try to use the word at the point
@@ -145,8 +145,6 @@ class ColorConvert(sublime_plugin.TextCommand):
             try:
                 color = Color(source[1])
                 result = convert(color, format)
-                # if result starts with hsl/hsla we need to post-process
-                # the percentages need to be converted to floats
                 print(result)
                 self.view.replace(edit, source[0], result)
             except Exception:
