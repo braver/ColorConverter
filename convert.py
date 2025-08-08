@@ -6,49 +6,31 @@ import sublime_plugin
 
 # hex color, but without the first #
 HEX_COLOR_RE = re.compile(r'([a-f0-9]{6}|[a-f0-9]{3})', re.IGNORECASE)
-
-RGB_COLOR_RE = re.compile(
-    r'rgb\s*\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)',
-    re.IGNORECASE
-)
-
-# maybe? (rgba?|hsla?)\([^)]+\)
-""" test set:
-rgb(255 255 255)
-rgb(255 255 255 / 50%)
-rgba(0 255 255)
-rgb(0, 255, 255)
-rgb(0, 255, 255, 50%)
-hsl(120deg 75% 25%)
-hsl(120 75 25)
-hsl(120deg 75% 25% / 60%)
-hsl(none 75% 25%)
-hsl(from green h s l / 0.5)
-hsl(from #0000FF h s calc(l + 20))
-hsl(from rgb(200 0 0) calc(h + 30) s calc(l + 30))
-hsla(120deg 75% 25% / 60%)
-hsl(120, 75%, 25%)
-hsl(120deg, 75%, 25%, 0.8)
-"""
+RGB_COLOR_RE = re.compile(r'(rgba?|hsla?|color)\([^)]+\)', re.IGNORECASE)
 
 
 def find_rgb_color_at_region(view, region):
-    # Expand to a reasonable range around the cursor (e.g., line, or +/–30 chars)
-    line_region = view.line(region)
-    line_text = view.substr(line_region)
+    # from the cursor widen 50 points in both directions to search for a color
+    point = region.begin()
+    visible = view.visible_region()
+    start = point - 50
+    end = point + 50
+    if start < visible.begin():
+        start = visible.begin()
+    if end > visible.end():
+        end = visible.end()
 
-    # Adjust the region's offset relative to the line
-    offset = region.a - line_region.a
+    search_region = sublime.Region(start, end)
+    content = view.substr(search_region)
 
-    # Search all rgb() in the line, and see if the cursor is inside one
-    for match in RGB_COLOR_RE.finditer(line_text):
-        match_start, match_end = match.span()
-        if match_start <= offset <= match_end:
-            # Found the rgb() the cursor is inside
-            rgb_region = sublime.Region(line_region.a + match_start, line_region.a + match_end)
-            rgb_string = view.substr(rgb_region)
-            return rgb_region, rgb_string
-    return None, None
+    relative_cursor_pos = region.a - search_region.a
+
+    for m in RGB_COLOR_RE.finditer(content):
+        match_start, match_end = m.span()
+        if match_start <= relative_cursor_pos <= match_end:
+            rgb_region = sublime.Region(search_region.a + m.start(0), search_region.a + m.end(0))
+            return (rgb_region, extract_word(view, rgb_region))
+    return None
 
 
 def extract_word(view, region):
@@ -60,12 +42,12 @@ def get_cursor_color(view, region):
         then return the exact region of that string, and the string itself
     """
 
-    # get_cursor_color from ColorHints takes a large region (+/- 50) around the cursor
-    # then applies a complex regex that will actually look for all kinds of patterns
-    # ... let's try for something more elegant, like handling one pattern at a time
+    # first try to find rgb() like color function colors
+    rgb = find_rgb_color_at_region(view, region)
+    if rgb is not None:
+        return rgb
 
-    # First handle colors that are words: names and hex
-    # Get the word under the cursor
+    # otherwise try to use the word at the point
     word_region = view.word(region)
 
     word = extract_word(view, word_region)
