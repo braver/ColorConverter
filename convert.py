@@ -6,6 +6,8 @@ import sublime_plugin
 
 # hex color, but without the first #
 HEX_COLOR_RE = re.compile(r'([a-f0-9]{6}|[a-f0-9]{3})', re.IGNORECASE)
+# relatively naive color function search
+# coloraide doesn't understand the more complex "from gree" notations anyway
 RGB_COLOR_RE = re.compile(r'(rgba?|hsla?|color)\([^)]+\)', re.IGNORECASE)
 
 
@@ -45,9 +47,11 @@ def get_cursor_color(view, region):
     # first try to find rgb() like color function colors
     rgb = find_rgb_color_at_region(view, region)
     if rgb is not None:
+        print(rgb)
         return rgb
 
     # otherwise try to use the word at the point
+    print('word mode')
     word_region = view.word(region)
 
     word = extract_word(view, word_region)
@@ -98,7 +102,7 @@ def convert(color, format):
     common_args = dict(
         comma=settings.get('commas'),
         percent=settings.get('%'),
-        color=settings.get('color()')
+        color=settings.get('color()')  # TODO: color should be an srgb space format option
     )
 
     if format == 'hsl':
@@ -131,6 +135,9 @@ class ColorConvert(sublime_plugin.TextCommand):
             try:
                 color = Color(source[1])
                 result = convert(color, format)
+                # if result starts with hsl/hsla we need to post-process
+                # the percentages need to be converted to floats
+                print(result)
                 self.view.replace(edit, source[0], result)
             except Exception:
                 sublime.status_message('That does not seem to be a color')
