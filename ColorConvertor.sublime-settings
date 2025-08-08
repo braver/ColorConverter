@@ -1,7 +1,4 @@
 {
-    // Use the color() functional notation instead of in rgb(), hsl(), etc.
-    "color()": false,
-
     // Enable commas in rgb(), hsl(), etc., there are optional in CSS.
     "commas": false,
 

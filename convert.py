@@ -71,17 +71,28 @@ def convert(color, format):
         # caveat: if the color has no name, it will fall back to rgb() probably
         return color.to_string(names=True)
 
+    if format == 'color':
+        return color.to_string(
+            color=True,
+            comma=settings.get('commas')
+        )
+
+    if format == 'colora':
+        return color.to_string(
+            alpha=True,
+            color=True,
+            comma=settings.get('commas')
+        )
+
     if format == 'rgb':
         return color.to_string(
             comma=settings.get('commas'),
-            color=settings.get('color()')
         )
 
     if format == 'rgba':
         return color.to_string(
             alpha=True,
-            comma=settings.get('commas'),
-            color=settings.get('color()')
+            comma=settings.get('commas')
         )
 
     if format == 'hex':
@@ -101,8 +112,7 @@ def convert(color, format):
 
     common_args = dict(
         comma=settings.get('commas'),
-        percent=settings.get('%'),
-        color=settings.get('color()')  # TODO: color should be an srgb space format option
+        percent=settings.get('%')
     )
 
     if format == 'hsl':
