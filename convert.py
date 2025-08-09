@@ -1,4 +1,5 @@
 from coloraide import Color
+from decimal import Decimal
 import re
 import sublime
 import sublime_plugin
@@ -8,10 +9,11 @@ import sublime_plugin
 HEX_COLOR_RE = re.compile(r'([a-f0-9]{6}|[a-f0-9]{3})', re.IGNORECASE)
 # relatively naive color function search
 # coloraide doesn't understand the more complex "from gree" notations anyway
-RGB_COLOR_RE = re.compile(r'(rgba?|hsla?|color)\([^)]+\)', re.IGNORECASE)
+RGB_COLOR_RE = re.compile(r'(rgba?|color)\([^)]+\)', re.IGNORECASE)
+HLS_RE = re.compile(r'hsla?\(((?P<angle>\d+)(?:[0-9.]+)?|(?P<none>none)),?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)')  # noqa: E501
 
 
-def find_rgb_color_at_region(view, region):
+def find_color_func_at_region(view, region):
     # from the cursor widen 50 points in both directions to search for a color
     point = region.begin()
     visible = view.visible_region()
@@ -30,8 +32,28 @@ def find_rgb_color_at_region(view, region):
     for m in RGB_COLOR_RE.finditer(content):
         match_start, match_end = m.span()
         if match_start <= relative_cursor_pos <= match_end:
-            rgb_region = sublime.Region(search_region.a + m.start(0), search_region.a + m.end(0))
-            return (rgb_region, extract_word(view, rgb_region))
+            match_region = sublime.Region(search_region.a + m.start(0), search_region.a + m.end(0))
+            return (match_region, Color(extract_word(view, match_region)))
+
+    for m in HLS_RE.finditer(content):
+        match_start, match_end = m.span()
+        if match_start <= relative_cursor_pos <= match_end:
+            match_region = sublime.Region(search_region.a + m.start(0), search_region.a + m.end(0))
+            # with the regex split out the parts of the h, s, l, a
+            hue = 0
+            if not m.group('none'):
+                hue = Decimal(m.group('angle'))
+            sat = Decimal(m.group('sat') or 0) / 100
+            light = Decimal(m.group('light') or 0) / 100
+
+            opacity = 1
+            if m.group('opdec'):
+                opacity = Decimal(m.group('opdec'))
+            elif m.group('opperc'):
+                opacity = Decimal(m.group('opperc')) / 100
+
+            # create the color object and convert to srgb
+            return (match_region, Color('hsl', [hue, sat, light], opacity).convert('srgb'))
     return None
 
 
@@ -45,7 +67,7 @@ def get_cursor_color(view, region):
     """
 
     # first try to find rgb() like color function colors
-    rgb = find_rgb_color_at_region(view, region)
+    rgb = find_color_func_at_region(view, region)
     if rgb is not None:
         print(rgb[1])
         return rgb
@@ -60,7 +82,7 @@ def get_cursor_color(view, region):
         if region.a > 0 and view.substr(sublime.Region(word_region.a - 1, word_region.a)) == '#':
             word_region = sublime.Region(word_region.a - 1, word_region.b)
 
-    return (word_region, extract_word(view, word_region))
+    return (word_region, Color(extract_word(view, word_region)))
 
 
 def convert(color, format):
@@ -117,19 +139,33 @@ def convert(color, format):
 
     if format == 'hsl':
         color.convert('hsl', in_place=True)
-        return color.to_string(**common_args)
+        return color.to_string(
+            percent=True,
+            comma=settings.get('commas')
+        )
 
     if format == 'hsla':
         color.convert('hsl', in_place=True)
-        return color.to_string(alpha=True, **common_args)
+        return color.to_string(
+            alpha=True,
+            percent=True,
+            comma=settings.get('commas')
+        )
 
     if format == 'lab':
         color.convert('lab', in_place=True)
-        return color.to_string(**common_args)
+        return color.to_string(
+            comma=settings.get('commas'),
+            percent=settings.get('%')
+        )
 
     if format == 'laba':
         color.convert('lab', in_place=True)
-        return color.to_string(alpha=True, **common_args)
+        return color.to_string(
+            alpha=True,
+            comma=settings.get('commas'),
+            percent=settings.get('%')
+        )
 
 
 class ColorConvert(sublime_plugin.TextCommand):
@@ -140,10 +176,9 @@ class ColorConvert(sublime_plugin.TextCommand):
     def run(self, edit, format='rgb'):
         sels = self.view.sel()
         for sel in sels:
-            source = get_cursor_color(self.view, sel)
-
             try:
-                color = Color(source[1])
+                source = get_cursor_color(self.view, sel)
+                color = source[1]
                 result = convert(color, format)
                 print(result)
                 self.view.replace(edit, source[0], result)
