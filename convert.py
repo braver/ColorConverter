@@ -13,8 +13,10 @@ RGB_COLOR_RE = re.compile(r'(rgba?|color)\([^)]+\)', re.IGNORECASE)
 HLS_RE = re.compile(r'hsla?\(((?P<angle>\d+)(?:[0-9.]+)?|(?P<none>none)),?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)')  # noqa: E501
 
 
-def find_color_func_at_region(view, region):
-    # from the cursor widen 50 points in both directions to search for a color
+def get_search_region(view, region):
+    """ From the cursor widen 50 points in both directions
+        to search for a color.
+    """
     point = region.begin()
     visible = view.visible_region()
     start = point - 50
@@ -24,7 +26,29 @@ def find_color_func_at_region(view, region):
     if end > visible.end():
         end = visible.end()
 
-    search_region = sublime.Region(start, end)
+    return sublime.Region(start, end)
+
+
+def parse_hsl(match):
+    """ With the regex split out the parts of the h, s, l, a. """
+    hue = 0
+    if not match.group('none'):
+        hue = Decimal(match.group('angle'))
+    sat = Decimal(match.group('sat') or 0) / 100
+    light = Decimal(match.group('light') or 0) / 100
+
+    opacity = 1
+    if match.group('opdec'):
+        opacity = Decimal(match.group('opdec'))
+    elif match.group('opperc'):
+        opacity = Decimal(match.group('opperc')) / 100
+
+    # create the color object and convert to srgb
+    return Color('hsl', [hue, sat, light], opacity).convert('srgb')
+
+
+def find_color_func_at_region(view, region):
+    search_region = get_search_region(view, region)
     content = view.substr(search_region)
 
     relative_cursor_pos = region.a - search_region.a
@@ -39,21 +63,8 @@ def find_color_func_at_region(view, region):
         match_start, match_end = m.span()
         if match_start <= relative_cursor_pos <= match_end:
             match_region = sublime.Region(search_region.a + m.start(0), search_region.a + m.end(0))
-            # with the regex split out the parts of the h, s, l, a
-            hue = 0
-            if not m.group('none'):
-                hue = Decimal(m.group('angle'))
-            sat = Decimal(m.group('sat') or 0) / 100
-            light = Decimal(m.group('light') or 0) / 100
+            return (match_region, parse_hsl(m))
 
-            opacity = 1
-            if m.group('opdec'):
-                opacity = Decimal(m.group('opdec'))
-            elif m.group('opperc'):
-                opacity = Decimal(m.group('opperc')) / 100
-
-            # create the color object and convert to srgb
-            return (match_region, Color('hsl', [hue, sat, light], opacity).convert('srgb'))
     return None
 
 
