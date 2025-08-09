@@ -212,15 +212,6 @@ class ColorConvert(sublime_plugin.TextCommand):
                 sublime.status_message('That does not seem to be a color')
 
 
-class ContextParent(sublime_plugin.TextCommand):
-    def is_visible(self):
-        settings = sublime.load_settings('ColorConvertor.sublime-settings')
-        if settings.get('context_menu'):
-            return True
-
-        return False
-
-
 class ContextConvert(sublime_plugin.TextCommand):
     def want_event(self):
         return True
