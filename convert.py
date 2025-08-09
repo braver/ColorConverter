@@ -13,6 +13,20 @@ RGB_COLOR_RE = re.compile(r'(rgba?|color)\([^)]+\)', re.IGNORECASE)
 HLS_RE = re.compile(r'hsla?\(((?P<angle>\d+)(?:[0-9.]+)?|(?P<none>none)),?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)')  # noqa: E501
 
 
+def find_point(view, event):
+    if not view:
+        return None
+
+    if event is not None:
+        return event['text_point']
+    else:
+        selections = view.sel()
+        for selection in selections:
+            return selection.a
+
+    return None
+
+
 def get_search_region(view, region):
     """ From the cursor widen 50 points in both directions
         to search for a color.
@@ -196,3 +210,41 @@ class ColorConvert(sublime_plugin.TextCommand):
                 self.view.replace(edit, source[0], result)
             except Exception:
                 sublime.status_message('That does not seem to be a color')
+
+
+class ContextParent(sublime_plugin.TextCommand):
+    def is_visible(self):
+        settings = sublime.load_settings('ColorConvertor.sublime-settings')
+        if settings.get('context_menu'):
+            return True
+
+        return False
+
+
+class ContextConvert(sublime_plugin.TextCommand):
+    def want_event(self):
+        return True
+
+    def is_visible(self, event=None):
+        view = self.view
+        pnt = find_point(view, event)
+        if not pnt:
+            return False
+
+        return True
+
+    def run(self, edit, value, event=None):
+        view = self.view
+        pnt = find_point(view, event)
+
+        if not pnt:
+            view.window().status_message('No selection')
+            return
+
+        try:
+            source = get_cursor_color(self.view, sublime.Region(pnt, pnt))
+            color = source[1]
+            result = convert(color, value)
+            self.view.replace(edit, source[0], result)
+        except Exception:
+            sublime.status_message('That does not seem to be a color')
