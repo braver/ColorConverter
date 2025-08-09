@@ -80,11 +80,9 @@ def get_cursor_color(view, region):
     # first try to find rgb() like color function colors
     rgb = find_color_func_at_region(view, region)
     if rgb is not None:
-        print(rgb[1])
         return rgb
 
     # otherwise try to use the word at the point
-    print('word mode')
     word_region = view.word(region)
 
     word = extract_word(view, word_region)
@@ -96,46 +94,46 @@ def get_cursor_color(view, region):
     return (word_region, Color(extract_word(view, word_region)))
 
 
-def convert(color, format):
-    """ Convert a Color to a target format """
+def convert(color, value):
+    """ Convert a Color to a target format value """
     settings = sublime.load_settings('ColorConvertor.sublime-settings')
 
-    if format == 'name':
+    if value == 'name':
         # caveat: if the color has no name, it will fall back to rgb() probably
         return color.to_string(names=True)
 
-    if format == 'color':
+    if value == 'color':
         return color.to_string(
             color=True,
             comma=settings.get('commas')
         )
 
-    if format == 'colora':
+    if value == 'colora':
         return color.to_string(
             alpha=True,
             color=True,
             comma=settings.get('commas')
         )
 
-    if format == 'rgb':
+    if value == 'rgb':
         return color.to_string(
             comma=settings.get('commas'),
         )
 
-    if format == 'rgba':
+    if value == 'rgba':
         return color.to_string(
             alpha=True,
             comma=settings.get('commas')
         )
 
-    if format == 'hex':
+    if value == 'hex':
         return color.to_string(
             hex=True,
             upper=settings.get('hex_case') == 'upper',
             compress=settings.get('hex_short'),
         )
 
-    if format == 'hexa':
+    if value == 'hexa':
         return color.to_string(
             alpha=True,
             hex=True,
@@ -148,7 +146,7 @@ def convert(color, format):
         percent=settings.get('%')
     )
 
-    if format == 'hsl':
+    if value == 'hsl':
         color.convert('hsl', in_place=True)
         args = dict(
             percent=True,
@@ -157,7 +155,7 @@ def convert(color, format):
             args['precision'] = 0
         return color.to_string(**args)
 
-    if format == 'hsla':
+    if value == 'hsla':
         color.convert('hsl', in_place=True)
         args = dict(
             alpha=True,
@@ -167,14 +165,14 @@ def convert(color, format):
             args['precision'] = [0, 0, 0, 3]
         return color.to_string(**args)
 
-    if format == 'lab':
+    if value == 'lab':
         color.convert('lab', in_place=True)
         return color.to_string(
             comma=settings.get('commas'),
             percent=settings.get('%')
         )
 
-    if format == 'laba':
+    if value == 'laba':
         color.convert('lab', in_place=True)
         return color.to_string(
             alpha=True,
@@ -188,14 +186,13 @@ class ColorConvert(sublime_plugin.TextCommand):
     def __init__(self, view):
         self.view = view
 
-    def run(self, edit, format='rgb'):
+    def run(self, edit, value='rgb'):
         sels = self.view.sel()
         for sel in sels:
             try:
                 source = get_cursor_color(self.view, sel)
                 color = source[1]
-                result = convert(color, format)
-                print(result)
+                result = convert(color, value)
                 self.view.replace(edit, source[0], result)
             except Exception:
                 sublime.status_message('That does not seem to be a color')
