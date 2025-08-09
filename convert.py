@@ -150,18 +150,22 @@ def convert(color, format):
 
     if format == 'hsl':
         color.convert('hsl', in_place=True)
-        return color.to_string(
+        args = dict(
             percent=True,
-            comma=settings.get('commas')
-        )
+            comma=settings.get('commas'))
+        if settings.get('hsl_round'):
+            args['precision'] = 0
+        return color.to_string(**args)
 
     if format == 'hsla':
         color.convert('hsl', in_place=True)
-        return color.to_string(
+        args = dict(
             alpha=True,
             percent=True,
-            comma=settings.get('commas')
-        )
+            comma=settings.get('commas'))
+        if settings.get('hsl_round'):
+            args['precision'] = [0, 0, 0, 3]
+        return color.to_string(**args)
 
     if format == 'lab':
         color.convert('lab', in_place=True)
