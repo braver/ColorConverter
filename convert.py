@@ -14,6 +14,7 @@ HLS_RE = re.compile(r'hsla?\(((?P<angle>[0-9.]+)(?:deg)?|(?P<none>none)),?\s*(?P
 
 
 def find_point(view, event):
+    """ Find the clicked point for the context menu """
     if not view:
         return None
 
@@ -27,14 +28,13 @@ def find_point(view, event):
     return None
 
 
-def get_search_region(view, region):
+def get_search_region(view, pnt):
     """ From the cursor widen 50 points in both directions
         to search for a color.
     """
-    point = region.begin()
     visible = view.visible_region()
-    start = point - 50
-    end = point + 50
+    start = pnt - 50
+    end = pnt + 50
     if start < visible.begin():
         start = visible.begin()
     if end > visible.end():
@@ -61,11 +61,11 @@ def parse_hsl(match):
     return Color('hsl', [hue, sat, light], opacity).convert('srgb')
 
 
-def find_color_func_at_region(view, region):
-    search_region = get_search_region(view, region)
+def find_color_func_at_point(view, pnt):
+    search_region = get_search_region(view, pnt)
     content = view.substr(search_region)
 
-    relative_cursor_pos = region.a - search_region.a
+    relative_cursor_pos = pnt - search_region.a
 
     for m in RGB_COLOR_RE.finditer(content):
         match_start, match_end = m.span()
@@ -86,23 +86,23 @@ def extract_word(view, region):
     return view.substr(region).lower()
 
 
-def get_cursor_color(view, region):
-    """ Find the color string around the given region,
+def get_cursor_color(view, pnt):
+    """ Find the color string around the given point,
         then return the exact region of that string, and the string itself
     """
 
     # first try to find rgb() like color function colors
-    rgb = find_color_func_at_region(view, region)
+    rgb = find_color_func_at_point(view, pnt)
     if rgb is not None:
         return rgb
 
     # otherwise try to use the word at the point
-    word_region = view.word(region)
+    word_region = view.word(pnt)
 
     word = extract_word(view, word_region)
     # If the word looks like a hex and is preceded by a #, include it in the word
     if HEX_COLOR_RE.match(word):
-        if region.a > 0 and view.substr(sublime.Region(word_region.a - 1, word_region.a)) == '#':
+        if pnt > 0 and view.substr(sublime.Region(word_region.a - 1, word_region.a)) == '#':
             word_region = sublime.Region(word_region.a - 1, word_region.b)
 
     return (word_region, Color(extract_word(view, word_region)))
@@ -161,7 +161,7 @@ class ColorConvert(sublime_plugin.TextCommand):
         sels = self.view.sel()
         for sel in sels:
             try:
-                source = get_cursor_color(self.view, sel)
+                source = get_cursor_color(self.view, sel.begin())
                 color = source[1]
                 result = convert(color, value)
                 self.view.replace(edit, source[0], result)
@@ -190,7 +190,7 @@ class ContextConvert(sublime_plugin.TextCommand):
             return
 
         try:
-            source = get_cursor_color(self.view, sublime.Region(pnt, pnt))
+            source = get_cursor_color(self.view, pnt)
             color = source[1]
             result = convert(color, value)
             if value == 'name' and result.startswith('rgb'):
