@@ -16,6 +16,11 @@
         }
     },
     {
+        "caption": "ColorConvertor: Convert all to lab",
+        "command": "color_convert_all",
+        "args": { "value": "lab" }
+    },
+    {
         "caption": "ColorConvertor: Convert to name",
         "command": "color_convert",
         "args": { "value": "name" }
