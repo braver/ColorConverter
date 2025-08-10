@@ -100,10 +100,17 @@ def get_cursor_color(view, pnt):
     word_region = view.word(pnt)
 
     word = extract_word(view, word_region)
-    # If the word looks like a hex and is preceded by a #, include it in the word
+
+    # if all we have is #, move the selection to the next character
+    # because in #abc # and abc are 2 separate words
+    if word.strip() == '#':
+        word_region = view.word(pnt + 1)
+        word = extract_word(view, word_region)
+
+    # if the word looks like a hex and is preceded by a #, include it in the word
     if HEX_COLOR_RE.match(word):
-        if pnt > 0 and view.substr(sublime.Region(word_region.a - 1, word_region.a)) == '#':
-            word_region = sublime.Region(word_region.a - 1, word_region.b)
+        if pnt > 0 and view.substr(sublime.Region(word_region.begin() - 1, word_region.begin())) == '#':
+            word_region = sublime.Region(word_region.begin() - 1, word_region.end())
 
     return (word_region, Color(extract_word(view, word_region)))
 
