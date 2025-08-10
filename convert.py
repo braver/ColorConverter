@@ -12,34 +12,6 @@ HEX_COLOR_RE = re.compile(r'([a-f0-9]{6}|[a-f0-9]{3})', re.IGNORECASE)
 RGB_COLOR_RE = re.compile(r'(rgba?|color)\([^)]+\)', re.IGNORECASE)
 HLS_RE = re.compile(r'hsla?\(((?P<angle>\d+)(?:[0-9.]+)?|(?P<none>none)),?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)')  # noqa: E501
 
-QUICK_PANEL_OPTIONS = [
-    'name',
-    'hexadecimal',
-    'hexadecimal with alpha',
-    'rgb()',
-    'rgb() with alpha',
-    'hsl()',
-    'hsl() with alpha',
-    'color()',
-    'color() with alpha',
-    'lab()',
-    'lab() with alpha',
-]
-
-QUICK_PANEL_MAPPING = {
-    'name': 'name',
-    'hexadecimal': 'hex',
-    'hexadecimal with alpha': 'hexa',
-    'rgb()': 'rgb',
-    'rgb() with alpha': 'rgba',
-    'hsl()': 'hsl',
-    'hsl() with alpha': 'hsla',
-    'color()': 'color',
-    'color() with alpha': 'colora',
-    'lab()': 'lab',
-    'lab() with alpha': 'laba',
-}
-
 
 def find_point(view, event):
     if not view:
@@ -241,19 +213,10 @@ class ColorConvert(sublime_plugin.TextCommand):
 
 
 class ContextConvert(sublime_plugin.TextCommand):
-    def __init__(self, view):
-        self.view = view
-        self.pnt = None
-        self.edit = None
-
     def want_event(self):
         return True
 
     def is_visible(self, event=None):
-        settings = sublime.load_settings('ColorConvertor.sublime-settings')
-        if not settings.get('context_menu'):
-            return False
-
         view = self.view
         pnt = find_point(view, event)
         if not pnt:
@@ -261,24 +224,18 @@ class ContextConvert(sublime_plugin.TextCommand):
 
         return True
 
-    def convert_from_qp(self, index):
-        print(self.pnt)
-        # try:
-        source = get_cursor_color(self.view, sublime.Region(self.pnt, self.pnt))
-        color = source[1]
-        print(color)
-        result = convert(color, QUICK_PANEL_MAPPING[QUICK_PANEL_OPTIONS[index]])
-        self.view.replace(self.edit, source[0], result)
-        # except Exception:
-        #     sublime.status_message('That does not seem to be a color')
+    def run(self, edit, value, event=None):
+        view = self.view
+        pnt = find_point(view, event)
 
-    def run(self, edit, event=None):
-        self.edit = edit
-        self.pnt = find_point(self.view, event)
-
-        if not self.pnt:
-            self.view.window().status_message('No selection')
+        if not pnt:
+            view.window().status_message('No selection')
             return
 
-        window = self.view.window()
-        window.show_quick_panel(QUICK_PANEL_OPTIONS, self.convert_from_qp)
+        try:
+            source = get_cursor_color(self.view, sublime.Region(pnt, pnt))
+            color = source[1]
+            result = convert(color, value)
+            self.view.replace(edit, source[0], result)
+        except Exception:
+            sublime.status_message('That does not seem to be a color')

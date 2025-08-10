@@ -13,7 +13,4 @@
 
     // Enable % units in color(), hsl() etc, these are optional in CSS.
     "%": false,
-
-    // Enable the context menu by setting the target value you prefer.
-    "context_menu": true
 }
