@@ -112,21 +112,17 @@ def convert(color, value):
     """ Convert a Color to a target format value """
     settings = sublime.load_settings('ColorConvertor.sublime-settings')
 
+    common_args = dict(
+        comma=settings.get('commas'),
+        percent=settings.get('%')
+    )
+
+    if settings.get('round'):
+        common_args['precision'] = [0, 0, 0, 3]
+
     if value == 'name':
         # caveat: if the color has no name, it will fall back to rgb() probably
         return color.to_string(names=True)
-
-    if value == 'color':
-        return color.to_string(
-            color=True,
-            comma=settings.get('commas')
-        )
-
-    if value == 'rgb':
-        args = dict(comma=settings.get('commas'))
-        if settings.get('round'):
-            args['precision'] = [0, 0, 0, 3]
-        return color.to_string(**args)
 
     if value == 'hex':
         return color.to_string(
@@ -135,21 +131,25 @@ def convert(color, value):
             compress=settings.get('hex_short'),
         )
 
+    if value == 'color':
+        if not settings.get('%'):
+            common_args['precision'] = None
+        return color.to_string(
+            color=True,
+            **common_args
+        )
+
+    if value == 'rgb':
+        common_args['percent'] = settings.get('%_rgb')
+        return color.to_string(**common_args)
+
     if value == 'hsl':
         color.convert('hsl', in_place=True)
-        args = dict(
-            percent=True,
-            comma=settings.get('commas'))
-        if settings.get('round'):
-            args['precision'] = [0, 0, 0, 3]
-        return color.to_string(**args)
+        return color.to_string(**common_args)
 
     if value == 'lab':
         color.convert('lab', in_place=True)
-        return color.to_string(
-            comma=settings.get('commas'),
-            percent=settings.get('%')
-        )
+        return color.to_string(**common_args)
 
 
 class ColorConvert(sublime_plugin.TextCommand):

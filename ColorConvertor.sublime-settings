@@ -1,16 +1,19 @@
 {
-    // Enable commas in rgb(), hsl(), etc., these are optional in CSS.
-    "commas": false,
-
     // Should hexadecimal colors be in uppercase, or lowercase?
     "hex_case": "lower",
     // Should hexadecimal colors be in short format, e.g. #333?
     "hex_short": true,
 
-    // When converting to/from HSL, round values to whole numbers.
+    // Enable commas in rgb(), hsl(), etc., these are optional in CSS.
+    "commas": false,
+
+    // When converting to/from HSL, round percentages to whole numbers.
     // Disable this to use precision of 5.
     "round": true,
 
-    // Enable % units in color(), hsl() etc, these are optional in CSS.
+    // Enable % units in color(), hsl(), lab(), these are optional in CSS.
     "%": false,
+
+    // Enable % units in rgb(), instead of 0-255.
+    "%_rgb": false,
 }
