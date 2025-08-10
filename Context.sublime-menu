@@ -1,62 +1,6 @@
 [
     {
-        "caption": "Convert Color To ...",
-        "children":[
-            {
-                "caption": "name",
-                "command": "context_convert",
-                "args": { "value": "name" }
-            },
-            {
-                "caption": "hexadecimal",
-                "command": "context_convert",
-                "args": { "value": "hex" }
-            },
-            {
-                "caption": "hexadecimal with alpha",
-                "command": "context_convert",
-                "args": { "value": "hexa" }
-            },
-            {
-                "caption": "rgb()",
-                "command": "context_convert",
-                "args": { "value": "rgb" }
-            },
-            {
-                "caption": "rgb() with alpha",
-                "command": "context_convert",
-                "args": { "value": "rgba" }
-            },
-            {
-                "caption": "hsl()",
-                "command": "context_convert",
-                "args": { "value": "hsl" }
-            },
-            {
-                "caption": "hsl() with alpha",
-                "command": "context_convert",
-                "args": { "value": "hsla" }
-            },
-            {
-                "caption": "color()",
-                "command": "context_convert",
-                "args": { "value": "color" }
-            },
-            {
-                "caption": "color() with alpha",
-                "command": "context_convert",
-                "args": { "value": "colora" }
-            },
-            {
-                "caption": "lab()",
-                "command": "context_convert",
-                "args": { "value": "lab" }
-            },
-            {
-                "caption": "lab() with alpha",
-                "command": "context_convert",
-                "args": { "value": "laba" }
-            }
-        ]
-    },
+        "caption": "Convert Color...",
+        "command": "context_convert"
+    }
 ]
