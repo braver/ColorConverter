@@ -6,10 +6,10 @@ import sublime_plugin
 
 
 # hex color, but without the first #
-HEX_COLOR_RE = r'([a-f0-9]{6}|[a-f0-9]{3})'
+HEX_COLOR_RE = re.compile(r'([a-f0-9]{6}|[a-f0-9]{3})', re.IGNORECASE)
 # relatively naive color function search
-# coloraide doesn't understand the more complex "from green" notations anyway
-RGB_COLOR_RE = r'(rgba?|hsla?|lab|color)\([^)]+\)'
+# coloraide doesn't understand the more complex "from gree" notations anyway
+RGB_COLOR_RE = re.compile(r'(rgba?|color)\([^)]+\)', re.IGNORECASE)
 HLS_RE = re.compile(r'hsla?\(((?P<angle>[0-9.]+)(?:deg)?|(?P<none>none)),?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)', re.IGNORECASE)  # noqa: E501
 
 
@@ -32,8 +32,14 @@ def get_search_region(view, pnt):
     """ From the cursor widen 50 points in both directions
         to search for a color.
     """
-    start = max(pnt - 50, 0)
-    end = min(pnt + 50, view.size())
+    visible = view.visible_region()
+    start = pnt - 50
+    end = pnt + 50
+    if start < visible.begin():
+        start = visible.begin()
+    if end > visible.end():
+        end = visible.end()
+
     return sublime.Region(start, end)
 
 
@@ -61,7 +67,7 @@ def find_color_func_at_point(view, pnt):
 
     relative_cursor_pos = pnt - search_region.a
 
-    for m in re.compile(RGB_COLOR_RE, re.IGNORECASE).finditer(content):
+    for m in RGB_COLOR_RE.finditer(content):
         match_start, match_end = m.span()
         if match_start <= relative_cursor_pos <= match_end:
             match_region = sublime.Region(search_region.a + m.start(0), search_region.a + m.end(0))
@@ -102,7 +108,7 @@ def get_cursor_color(view, pnt):
         word = extract_word(view, word_region)
 
     # if the word looks like a hex and is preceded by a #, include it in the word
-    if re.compile(HEX_COLOR_RE, re.IGNORECASE).match(word):
+    if HEX_COLOR_RE.match(word):
         if pnt > 0 and view.substr(sublime.Region(word_region.begin() - 1, word_region.begin())) == '#':
             word_region = sublime.Region(word_region.begin() - 1, word_region.end())
 
@@ -154,6 +160,10 @@ def convert(color, value):
 
 
 class ColorConvert(sublime_plugin.TextCommand):
+
+    def __init__(self, view):
+        self.view = view
+
     def run(self, edit, value='rgb'):
         sels = self.view.sel()
         for sel in sels:
@@ -164,22 +174,6 @@ class ColorConvert(sublime_plugin.TextCommand):
                 self.view.replace(edit, source[0], result)
             except Exception:
                 sublime.status_message('That does not seem to be a color')
-
-
-class ColorConvertAll(sublime_plugin.TextCommand):
-    def run(self, edit, value='rgb'):
-        for line in self.view.lines(self.view.sel()[0]):
-            hexes = self.view.find_all(r'#([a-f0-9]{6}|[a-f0-9]{3})', flags=sublime.FindFlags.IGNORECASE, within=line)
-            # rgbs = self.view.find_all(RGB_COLOR_RE, within=line)
-            for region in hexes:
-                print(extract_word(self.view, region))
-                try:
-                    source = get_cursor_color(self.view, region.begin())
-                    color = source[1]
-                    result = convert(color, value)
-                    self.view.replace(edit, source[0], result)
-                except Exception:
-                    sublime.status_message('That does not seem to be a color')
 
 
 class ContextConvert(sublime_plugin.TextCommand):
