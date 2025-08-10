@@ -19,6 +19,8 @@ Note that relative value syntax (e.g. `color(from green ...`) is not supported.
 - Via the context menu.
 - You can set up a keyboard shortcut.
 
+Select or put your cursor on a color, then select the format to convert to.
+
 ## How to customize
 
 ### Key bindings
@@ -43,7 +45,8 @@ For more information on key bindings see the [community documentation](https://d
 To disable or customize the context menu:
 
 - Create a `ColorConvertor` directory in the `Packages` directory (which you can find via the Settings > Browse Packages menu item).
-- In that directory place a `Context.sublime-menu`. For its contents you can use this package's [original menu](https://github.com/braver/ColorConvertor/blob/main/Context.sublime-menu).
+- In that directory place a `Context.sublime-menu` file.
+  For its contents you can use this package's [original menu](https://github.com/braver/ColorConvertor/blob/main/Context.sublime-menu).
 
 This copy of the context menu now overrides the original one. You can for instance remove the formats you don't use. Or remove everything, leaving just `[]`, to remove and disable the menu completely.
 
