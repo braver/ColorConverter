@@ -13,21 +13,6 @@ RGB_COLOR_RE = r'(rgba?|hsla?|lab|color)\([^)]+\)'
 HLS_RE = re.compile(r'hsla?\(((?P<angle>[0-9.]+)(?:deg)?|(?P<none>none)),?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)', re.IGNORECASE)  # noqa: E501
 
 
-def find_point(view, event):
-    """ Find the clicked point for the context menu """
-    if not view:
-        return None
-
-    if event is not None:
-        return event['text_point']
-    else:
-        selections = view.sel()
-        for selection in selections:
-            return selection.a
-
-    return None
-
-
 def get_search_region(view, pnt):
     """ From the cursor widen 50 points in both directions
         to search for a color.
@@ -167,39 +152,54 @@ class ColorConvert(sublime_plugin.TextCommand):
 
 
 class ColorConvertAll(sublime_plugin.TextCommand):
+    def convert_region(self, edit, region, value):
+        try:
+            source = get_cursor_color(self.view, region.begin())
+            color = source[1]
+            result = convert(color, value)
+            self.view.replace(edit, source[0], result)
+        except Exception:
+            sublime.status_message('That does not seem to be a color')
+
     def run(self, edit, value='rgb'):
-        for line in self.view.lines(self.view.sel()[0]):
-            hexes = self.view.find_all(r'#([a-f0-9]{6}|[a-f0-9]{3})', flags=sublime.FindFlags.IGNORECASE, within=line)
-            # rgbs = self.view.find_all(RGB_COLOR_RE, within=line)
-            for region in hexes:
-                print(extract_word(self.view, region))
-                try:
-                    source = get_cursor_color(self.view, region.begin())
-                    color = source[1]
-                    result = convert(color, value)
-                    self.view.replace(edit, source[0], result)
-                except Exception:
-                    sublime.status_message('That does not seem to be a color')
+        hexes = self.view.find_all('#' + HEX_COLOR_RE, flags=sublime.FindFlags.IGNORECASE)
+        for region in reversed(hexes):
+            self.convert_region(edit, region, value)
+
+        rgbs = self.view.find_all(RGB_COLOR_RE, flags=sublime.FindFlags.IGNORECASE)
+        for region in reversed(rgbs):
+            self.convert_region(edit, region, value)
 
 
 class ContextConvert(sublime_plugin.TextCommand):
+    def find_point(self, event):
+        """ Find the clicked point for the context menu """
+        if not self.view:
+            return None
+
+        if event is not None:
+            return event['text_point']
+        else:
+            selections = self.view.sel()
+            for selection in selections:
+                return selection.a
+
+        return None
+
     def want_event(self):
         return True
 
     def is_visible(self, event=None):
-        view = self.view
-        pnt = find_point(view, event)
+        pnt = self.find_point(event)
         if not pnt:
             return False
 
         return True
 
     def run(self, edit, value, event=None):
-        view = self.view
-        pnt = find_point(view, event)
-
+        pnt = self.find_point(event)
         if not pnt:
-            view.window().status_message('No selection')
+            self.view.window().status_message('No selection')
             return
 
         try:

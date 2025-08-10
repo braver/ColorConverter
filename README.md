@@ -58,13 +58,3 @@ See also the [official documentation](https://www.sublimetext.com/docs/packages.
 ## Credits
 
 This package is built on the [coloraide](https://facelessuser.github.io/coloraide/) library by [Isaac Muse](https://github.com/facelessuser).
-
-
-## Replace all the colors!
-
-This is probably a common feature request.
-I haven't found a reliable way of iterating over larger ranges of a buffer.
-As soon as you start making changes the positions of each color in the document start to shift.
-You need to find a color, convert it, move to the end of the new color's region, find the next color, rinse repeat. So a single command for this is not currently planned.
-
-However, depending on your situation, you can use Sublime's Find > Quick Find All menu item, or the Find All option in the Find panel. This way you can easily select all colors you want to convert, and then use the command palette to convert to your format of choice.
