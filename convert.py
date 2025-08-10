@@ -10,7 +10,7 @@ HEX_COLOR_RE = re.compile(r'([a-f0-9]{6}|[a-f0-9]{3})', re.IGNORECASE)
 # relatively naive color function search
 # coloraide doesn't understand the more complex "from gree" notations anyway
 RGB_COLOR_RE = re.compile(r'(rgba?|color)\([^)]+\)', re.IGNORECASE)
-HLS_RE = re.compile(r'hsla?\(((?P<angle>\d+)(?:[0-9.]+)?|(?P<none>none)),?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)')  # noqa: E501
+HLS_RE = re.compile(r'hsla?\(((?P<angle>\d+)(?:[0-9.]+)(?:deg)?|(?P<none>none)),?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)', re.IGNORECASE)  # noqa: E501
 
 
 def find_point(view, event):
