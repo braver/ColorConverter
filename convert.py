@@ -122,22 +122,9 @@ def convert(color, value):
             comma=settings.get('commas')
         )
 
-    if value == 'colora':
-        return color.to_string(
-            alpha=True,
-            color=True,
-            comma=settings.get('commas')
-        )
-
     if value == 'rgb':
         return color.to_string(
             comma=settings.get('commas'),
-        )
-
-    if value == 'rgba':
-        return color.to_string(
-            alpha=True,
-            comma=settings.get('commas')
         )
 
     if value == 'hex':
@@ -147,32 +134,9 @@ def convert(color, value):
             compress=settings.get('hex_short'),
         )
 
-    if value == 'hexa':
-        return color.to_string(
-            alpha=True,
-            hex=True,
-            upper=settings.get('hex_case') == 'upper',
-            compress=settings.get('hex_short'),
-        )
-
-    common_args = dict(
-        comma=settings.get('commas'),
-        percent=settings.get('%')
-    )
-
     if value == 'hsl':
         color.convert('hsl', in_place=True)
         args = dict(
-            percent=True,
-            comma=settings.get('commas'))
-        if settings.get('hsl_round'):
-            args['precision'] = 0
-        return color.to_string(**args)
-
-    if value == 'hsla':
-        color.convert('hsl', in_place=True)
-        args = dict(
-            alpha=True,
             percent=True,
             comma=settings.get('commas'))
         if settings.get('hsl_round'):
@@ -182,14 +146,6 @@ def convert(color, value):
     if value == 'lab':
         color.convert('lab', in_place=True)
         return color.to_string(
-            comma=settings.get('commas'),
-            percent=settings.get('%')
-        )
-
-    if value == 'laba':
-        color.convert('lab', in_place=True)
-        return color.to_string(
-            alpha=True,
             comma=settings.get('commas'),
             percent=settings.get('%')
         )
