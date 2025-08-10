@@ -192,6 +192,10 @@ class ContextConvert(sublime_plugin.TextCommand):
             source = get_cursor_color(self.view, sublime.Region(pnt, pnt))
             color = source[1]
             result = convert(color, value)
+            if value == 'name' and result.startswith('rgb'):
+                # coloraide converts to rgb() if there is no name
+                sublime.status_message('This color does not have a name')
+                return
             self.view.replace(edit, source[0], result)
         except Exception:
             sublime.status_message('That does not seem to be a color')
