@@ -11,7 +11,15 @@ Any alpha value (opacity) present in the input color is retained in the output.
 - [`lab()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/lab)
 - [`color()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color)
 
+The `rgba()` and `hsla()` color functions are considered legacy:
+the `rgb()` and `hsl()` functions both also take an alpha channel. This package will convert from, but not _to_, these legacy formats.
+
 Note that relative value syntax (e.g. `color(from green ...`) is not supported.
+
+## TODO
+
+- Convert all colors in file to a format.
+- Convert all colors in a (multi-line) selection to a format.
 
 ## How to use
 
