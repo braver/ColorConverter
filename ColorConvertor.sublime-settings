@@ -7,9 +7,9 @@
     // Should hexadecimal colors be in short format, e.g. #333?
     "hex_short": true,
 
-    // Due to color space differences HSL values usually need to be rounded
-    // to get whole percentage values. Otherwise they have a precision of 5.
-    "hsl_round": true,
+    // When converting to/from HSL, round values to whole numbers.
+    // Disable this to use precision of 5.
+    "round": true,
 
     // Enable % units in color(), hsl() etc, these are optional in CSS.
     "%": false,

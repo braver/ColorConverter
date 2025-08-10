@@ -123,9 +123,10 @@ def convert(color, value):
         )
 
     if value == 'rgb':
-        return color.to_string(
-            comma=settings.get('commas'),
-        )
+        args = dict(comma=settings.get('commas'))
+        if settings.get('round'):
+            args['precision'] = [0, 0, 0, 3]
+        return color.to_string(**args)
 
     if value == 'hex':
         return color.to_string(
@@ -139,7 +140,7 @@ def convert(color, value):
         args = dict(
             percent=True,
             comma=settings.get('commas'))
-        if settings.get('hsl_round'):
+        if settings.get('round'):
             args['precision'] = [0, 0, 0, 3]
         return color.to_string(**args)
 
