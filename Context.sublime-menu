@@ -5,33 +5,33 @@
             {
                 "caption": "name",
                 "command": "context_convert",
-                "args": { "value": "name" }
+                "args": { "format": "name" }
             },
             {
                 "caption": "hex",
                 "command": "context_convert",
-                "args": { "value": "hex" }
+                "args": { "format": "hex" }
             },
             {
                 "caption": "rgb",
                 "command": "context_convert",
-                "args": { "value": "rgb" }
+                "args": { "format": "rgb" }
             },
             {
                 "caption": "hsl",
                 "command": "context_convert",
-                "args": { "value": "hsl" }
-            },
-            {
-                "caption": "color",
-                "command": "context_convert",
-                "args": { "value": "color" }
+                "args": { "format": "hsl" }
             },
             {
                 "caption": "lab",
                 "command": "context_convert",
-                "args": { "value": "lab" }
+                "args": { "format": "lab" }
             },
+            {
+                "caption": "color",
+                "command": "context_convert",
+                "args": { "format": "color" }
+            }
         ]
-    },
+    }
 ]

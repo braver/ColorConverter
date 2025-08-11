@@ -94,8 +94,8 @@ def get_cursor_color(view, pnt):
     return (word_region, Color(extract_word(view, word_region)))
 
 
-def convert(color, value):
-    """ Convert a Color to a target format value """
+def convert(color, format):
+    """ Convert a Color to a target format """
     settings = sublime.load_settings('ColorConvertor.sublime-settings')
 
     common_args = dict(
@@ -106,62 +106,62 @@ def convert(color, value):
     if settings.get('round'):
         common_args['precision'] = [0, 0, 0, 3]
 
-    if value == 'name':
+    if format == 'name':
         # caveat: if the color has no name, it will fall back to rgb() probably
         return color.to_string(names=True)
 
-    if value == 'hex':
+    if format == 'hex':
         return color.to_string(
             hex=True,
             upper=settings.get('hex_case') == 'upper',
             compress=settings.get('hex_short'),
         )
 
-    if value == 'color':
+    if format == 'color':
         if not settings.get('%'):
-            common_args['precision'] = None
+            del common_args['precision']
         return color.to_string(
             color=True,
             **common_args
         )
 
-    if value == 'rgb':
+    if format == 'rgb':
         common_args['percent'] = settings.get('%_rgb')
         return color.to_string(**common_args)
 
-    if value == 'hsl':
+    if format == 'hsl':
         color.convert('hsl', in_place=True)
         return color.to_string(**common_args)
 
-    if value == 'lab':
+    if format == 'lab':
         color.convert('lab', in_place=True)
         return color.to_string(**common_args)
 
 
 class ColorConvert(sublime_plugin.TextCommand):
-    def run(self, edit, value='rgb'):
+    def run(self, edit, format='rgb'):
         selections = self.view.sel()
         for sel in selections:
             try:
                 source = get_cursor_color(self.view, sel.begin())
                 color = source[1]
-                result = convert(color, value)
+                result = convert(color, format)
                 self.view.replace(edit, source[0], result)
             except Exception:
                 sublime.status_message('That does not seem to be a color')
 
 
 class ColorConvertAll(sublime_plugin.TextCommand):
-    def convert_region(self, edit, region, value):
+    def convert_region(self, edit, region, format):
         try:
             source = get_cursor_color(self.view, region.begin())
             color = source[1]
-            result = convert(color, value)
+            result = convert(color, format)
             self.view.replace(edit, source[0], result)
         except Exception:
             sublime.status_message('That does not seem to be a color')
 
-    def run(self, edit, value='rgb'):
+    def run(self, edit, format='rgb'):
         find_args = dict(flags=sublime.FindFlags.IGNORECASE)
 
         selections = self.view.sel()
@@ -170,7 +170,8 @@ class ColorConvertAll(sublime_plugin.TextCommand):
 
         hexes = self.view.find_all('#' + HEX_COLOR_RE, **find_args)
         for region in reversed(hexes):
-            self.convert_region(edit, region, value)
+            self.convert_region(edit, region, format)
+
 
         rgbs = self.view.find_all(RGB_COLOR_RE, **find_args)
         for region in reversed(rgbs):
@@ -202,7 +203,7 @@ class ContextConvert(sublime_plugin.TextCommand):
 
         return True
 
-    def run(self, edit, value, event=None):
+    def run(self, edit, format, event=None):
         pnt = self.find_point(event)
         if not pnt:
             self.view.window().status_message('No selection')
@@ -211,8 +212,8 @@ class ContextConvert(sublime_plugin.TextCommand):
         try:
             source = get_cursor_color(self.view, pnt)
             color = source[1]
-            result = convert(color, value)
-            if value == 'name' and result.startswith('rgb'):
+            result = convert(color, format)
+            if format == 'name' and result.startswith('rgb'):
                 # coloraide converts to rgb() if there is no name
                 sublime.status_message('This color does not have a name')
                 return
