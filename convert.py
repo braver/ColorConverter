@@ -140,8 +140,8 @@ def convert(color, value):
 
 class ColorConvert(sublime_plugin.TextCommand):
     def run(self, edit, value='rgb'):
-        sels = self.view.sel()
-        for sel in sels:
+        selections = self.view.sel()
+        for sel in selections:
             try:
                 source = get_cursor_color(self.view, sel.begin())
                 color = source[1]
@@ -162,11 +162,17 @@ class ColorConvertAll(sublime_plugin.TextCommand):
             sublime.status_message('That does not seem to be a color')
 
     def run(self, edit, value='rgb'):
-        hexes = self.view.find_all('#' + HEX_COLOR_RE, flags=sublime.FindFlags.IGNORECASE)
+        find_args = dict(flags=sublime.FindFlags.IGNORECASE)
+
+        selections = self.view.sel()
+        if selections[0].size() >= 1:
+            find_args['within'] = selections[0]
+
+        hexes = self.view.find_all('#' + HEX_COLOR_RE, **find_args)
         for region in reversed(hexes):
             self.convert_region(edit, region, value)
 
-        rgbs = self.view.find_all(RGB_COLOR_RE, flags=sublime.FindFlags.IGNORECASE)
+        rgbs = self.view.find_all(RGB_COLOR_RE, **find_args)
         for region in reversed(rgbs):
             self.convert_region(edit, region, value)
 
