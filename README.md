@@ -25,7 +25,7 @@ Note that relative value syntax (e.g. `color(from green ...`) is not supported.
 Select or put your cursor on a color, then select the format to convert to.
 
 It's also possible to convert all colors in a document.
-If you run "convert all" with an active selection, only the colors in that selection are converted.
+If you run "convert all" with an active selection, only the colors in that selection are converted (this requires a ST build of 4181 or newer).
 
 ## How to customize
 

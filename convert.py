@@ -50,13 +50,13 @@ def find_color_func_at_point(view, pnt):
     for m in re.compile(HLS_RE).finditer(content):
         match_start, match_end = m.span()
         if match_start <= relative_cursor_pos <= match_end:
-            match_region = sublime.Region(search_region.a + m.start(0), search_region.a + m.end(0))
+            match_region = sublime.Region(search_region.a + m.start(), search_region.a + m.end())
             return (match_region, parse_hsl(m))
 
     for m in re.compile(RGB_COLOR_RE).finditer(content):
         match_start, match_end = m.span()
         if match_start <= relative_cursor_pos <= match_end:
-            match_region = sublime.Region(search_region.a + m.start(0), search_region.a + m.end(0))
+            match_region = sublime.Region(search_region.a + m.start(), search_region.a + m.end())
             return (match_region, Color(extract_word(view, match_region)))
 
     return None
@@ -166,7 +166,7 @@ class ColorConvertAll(sublime_plugin.TextCommand):
         find_args = dict(flags=sublime.FindFlags.IGNORECASE)
 
         selections = self.view.sel()
-        if selections[0].size() >= 1:
+        if int(sublime.version()) >= 4181 and selections[0].size() >= 1:
             find_args['within'] = selections[0]
 
         hexes = self.view.find_all('#' + HEX_COLOR_RE, **find_args)
