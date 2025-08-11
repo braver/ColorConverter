@@ -195,15 +195,14 @@ class ContextConvert(sublime_plugin.TextCommand):
             return event['text_point']
         else:
             selections = self.view.sel()
-            for selection in selections:
-                return selection.a
+            return selections[0].begin() >= 0
 
         return None
 
     def want_event(self):
         return True
 
-    def is_visible(self, event=None):
+    def is_enabled(self, event=None):
         pnt = self.find_point(event)
         if not pnt:
             return False
