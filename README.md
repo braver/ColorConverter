@@ -1,4 +1,4 @@
-# ColorConvertor for Sublime Text
+# ColorConverter for Sublime Text
 
 Convert colors (e.g. in CSS) from one format to another. 
 The following formats are supported as both input and output.
@@ -18,7 +18,7 @@ Note that relative value syntax (e.g. `color(from green ...`) is not supported.
 
 ## How to use
 
-- Via the command palette (look for "ColorConvertor: Convert to ...").
+- Via the command palette (look for "ColorConverter: Convert to ...").
 - Via the context menu.
 - You can set up a keyboard shortcut.
 
@@ -37,7 +37,7 @@ Please refer to the preferences to fine-tune the output to your liking.
 
 ### Key bindings
 
-To set up a keyboard shortcut, open the ColorConvertor Key Bindings preferences,
+To set up a keyboard shortcut, open the ColorConverter Key Bindings preferences,
 either via the Packages Settings menu or the command palette.
 Copy the example to your personal key bindings file. You can customize the keyboard combination that triggers the command. 
 
@@ -56,9 +56,9 @@ For more information on key bindings see the [community documentation](https://d
 
 To disable or customize the context menu:
 
-- Create a `ColorConvertor` directory in the `Packages` directory (which you can find via the Settings > Browse Packages menu item).
+- Create a `ColorConverter` directory in the `Packages` directory (which you can find via the Settings > Browse Packages menu item).
 - In that directory place a `Context.sublime-menu` file.
-  For its contents you can use this package's [original menu](https://github.com/braver/ColorConvertor/blob/main/Context.sublime-menu).
+  For its contents you can use this package's [original menu](https://github.com/braver/ColorConverter/blob/main/Context.sublime-menu).
 
 This copy of the context menu now overrides the original one. You can for instance remove the formats you don't use. Or remove everything, leaving just `[]`, to remove and disable the menu completely.
 

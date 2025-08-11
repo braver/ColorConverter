@@ -97,7 +97,7 @@ def get_cursor_color(view, pnt):
 
 def convert(color, format):
     """ Convert a Color to a target format """
-    settings = sublime.load_settings('ColorConvertor.sublime-settings')
+    settings = sublime.load_settings('ColorConverter.sublime-settings')
 
     common_args = dict(
         comma=settings.get('commas'),

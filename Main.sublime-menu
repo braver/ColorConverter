@@ -10,21 +10,21 @@
                 "mnemonic": "P",
                 "children": [
                     {
-                        "caption": "ColorConvertor",
+                        "caption": "ColorConverter",
                         "children": [
                             {
                                 "caption": "Settings",
                                 "command": "edit_settings", "args":
                                 {
-                                    "base_file": "${packages}/ColorConvertor/ColorConvertor.sublime-settings",
-                                    "default": "// ColorConvertor Settings - User\n{\n\t$0\n}\n"
+                                    "base_file": "${packages}/ColorConverter/ColorConverter.sublime-settings",
+                                    "default": "// ColorConverter Settings - User\n{\n\t$0\n}\n"
                                 }
                             },
                             {
                                 "caption": "Key Bindings",
                                 "command": "edit_settings",
                                 "args": {
-                                    "base_file": "${packages}/ColorConvertor/Default ($platform).sublime-keymap",
+                                    "base_file": "${packages}/ColorConverter/Default ($platform).sublime-keymap",
                                     "default": "[\n\t$0\n]\n"
                                 }
                             }
