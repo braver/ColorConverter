@@ -1,0 +1,10 @@
+Welcome to ColorConvertor 3.0
+
+ColorConvertor is a new convertor for CSS colors,
+to convert to and from color names, hex, rgb(), hsl(), lab() and color().
+
+If you've upgraded from any of the "ancestor" packages,
+you may have to update your keybindings and settings.
+Please refer to the readme for more information:
+
+https://github.com/braver/ColorConvertor

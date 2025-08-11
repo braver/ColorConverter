@@ -29,6 +29,12 @@ If you run "convert all" with an active selection, only the colors in that selec
 
 ## How to customize
 
+### Output formats
+
+By default the output is minimalist:
+no commas or optional units, lowercase and short hexadecimals.
+Please refer to the preferences to fine-tune the output to your liking.
+
 ### Key bindings
 
 To set up a keyboard shortcut, open the ColorConvertor Key Bindings preferences,
