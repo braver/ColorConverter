@@ -1,4 +1,5 @@
 from coloraide import Color
+from coloraide.css import color_names
 from decimal import Decimal
 import re
 import sublime
@@ -10,7 +11,7 @@ HEX_COLOR_RE = r'([a-f0-9]{6}|[a-f0-9]{3})'
 # relatively naive color function search
 # coloraide doesn't understand the more complex "from green" notations anyway
 RGB_COLOR_RE = r'(rgba?|hsla?|lab|color)\([^)]+\)'
-HLS_RE = re.compile(r'hsla?\(((?P<angle>[0-9.]+)(?:deg)?|(?P<none>none)),?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)', re.IGNORECASE)  # noqa: E501
+HLS_RE = r'hsla?\(((?P<angle>[0-9.]+)(?:deg)?|(?P<none>none)),?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)'  # noqa: E501
 
 
 def get_search_region(view, pnt):
@@ -46,17 +47,17 @@ def find_color_func_at_point(view, pnt):
 
     relative_cursor_pos = pnt - search_region.a
 
-    for m in re.compile(RGB_COLOR_RE, re.IGNORECASE).finditer(content):
-        match_start, match_end = m.span()
-        if match_start <= relative_cursor_pos <= match_end:
-            match_region = sublime.Region(search_region.a + m.start(0), search_region.a + m.end(0))
-            return (match_region, Color(extract_word(view, match_region)))
-
-    for m in HLS_RE.finditer(content):
+    for m in re.compile(HLS_RE).finditer(content):
         match_start, match_end = m.span()
         if match_start <= relative_cursor_pos <= match_end:
             match_region = sublime.Region(search_region.a + m.start(0), search_region.a + m.end(0))
             return (match_region, parse_hsl(m))
+
+    for m in re.compile(RGB_COLOR_RE).finditer(content):
+        match_start, match_end = m.span()
+        if match_start <= relative_cursor_pos <= match_end:
+            match_region = sublime.Region(search_region.a + m.start(0), search_region.a + m.end(0))
+            return (match_region, Color(extract_word(view, match_region)))
 
     return None
 
@@ -172,10 +173,16 @@ class ColorConvertAll(sublime_plugin.TextCommand):
         for region in reversed(hexes):
             self.convert_region(edit, region, format)
 
+        # color functions and names are case sensitive
+        del find_args['flags']
 
         rgbs = self.view.find_all(RGB_COLOR_RE, **find_args)
         for region in reversed(rgbs):
-            self.convert_region(edit, region, value)
+            self.convert_region(edit, region, format)
+
+        names = self.view.find_all('(' + ('|').join(list(color_names.name2val_map)) + ')', **find_args)
+        for region in reversed(names):
+            self.convert_region(edit, region, format)
 
 
 class ContextConvert(sublime_plugin.TextCommand):
