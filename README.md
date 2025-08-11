@@ -67,3 +67,9 @@ See also the [official documentation](https://www.sublimetext.com/docs/packages.
 ## Credits
 
 This package is built on the [coloraide](https://facelessuser.github.io/coloraide/) library by [Isaac Muse](https://github.com/facelessuser).
+
+## Buy me a coffee 
+
+☕️👌🏻
+
+If you enjoy this package, feel free to make a little [donation via PayPal](https://paypal.me/koenlageveen) towards the coffee that keeps this project running. It's much appreciated!
