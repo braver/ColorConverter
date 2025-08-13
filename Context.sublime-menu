@@ -4,34 +4,40 @@
         "children":[
             {
                 "caption": "name",
-                "command": "context_convert",
+                "command": "context_color_convert",
                 "args": { "format": "name" }
             },
             {
                 "caption": "hex",
-                "command": "context_convert",
+                "command": "context_color_convert",
                 "args": { "format": "hex" }
             },
             {
                 "caption": "rgb",
-                "command": "context_convert",
+                "command": "context_color_convert",
                 "args": { "format": "rgb" }
             },
             {
                 "caption": "hsl",
-                "command": "context_convert",
+                "command": "context_color_convert",
                 "args": { "format": "hsl" }
             },
             {
                 "caption": "lab",
-                "command": "context_convert",
+                "command": "context_color_convert",
                 "args": { "format": "lab" }
             },
             {
                 "caption": "color",
-                "command": "context_convert",
+                "command": "context_color_convert",
                 "args": { "format": "color" }
-            }
+            },
+            { "caption": "-", "id": "copy-as-hex" },
+            {
+                "caption": "Copy as hex",
+                "command": "context_color_copy",
+                "args": { "format": "HEX6" }
+            },
         ]
     }
 ]

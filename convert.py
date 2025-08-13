@@ -118,6 +118,14 @@ def convert(color, format):
             compress=settings.get('hex_short'),
         )
 
+    if format == 'HEX6':
+        # "portable" version of hex that's uppercase and not compressed
+        return color.to_string(
+            hex=True,
+            upper=True,
+            compress=False,
+        )
+
     if format == 'color':
         if not settings.get('%'):
             del common_args['precision']
@@ -137,6 +145,17 @@ def convert(color, format):
     if format == 'lab':
         color.convert('lab', in_place=True)
         return color.to_string(**common_args)
+
+
+def pnt_to_clipboard(view, pnt, format):
+    try:
+        source = get_cursor_color(view, pnt)
+        color = source[1]
+        result = convert(color, format)
+        sublime.set_clipboard(result)
+        sublime.status_message('Copied {} to the clipboard'.format(result))
+    except Exception:
+        sublime.status_message('That does not seem to be a color')
 
 
 class ColorConvert(sublime_plugin.TextCommand):
@@ -185,7 +204,7 @@ class ColorConvertAll(sublime_plugin.TextCommand):
             self.convert_region(edit, region, format)
 
 
-class ContextConvert(sublime_plugin.TextCommand):
+class ContextCommand(sublime_plugin.TextCommand):
     def find_point(self, event):
         """ Find the clicked point for the context menu """
         if not self.view:
@@ -209,6 +228,8 @@ class ContextConvert(sublime_plugin.TextCommand):
 
         return True
 
+
+class ContextColorConvert(ContextCommand):
     def run(self, edit, format, event=None):
         pnt = self.find_point(event)
         if not pnt:
@@ -226,3 +247,18 @@ class ContextConvert(sublime_plugin.TextCommand):
             self.view.replace(edit, source[0], result)
         except Exception:
             sublime.status_message('That does not seem to be a color')
+
+
+class ContextColorCopy(ContextCommand):
+    def run(self, edit, format='HEX6', event=None):
+        pnt = self.find_point(event)
+        if not pnt:
+            self.view.window().status_message('No selection')
+            return
+        pnt_to_clipboard(self.view, pnt, format)
+
+
+class ColorConvertCopy(sublime_plugin.TextCommand):
+    def run(self, edit, format='HEX6'):
+        selections = self.view.sel()
+        pnt_to_clipboard(self.view, selections[0].begin(), format)

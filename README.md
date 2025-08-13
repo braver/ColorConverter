@@ -27,6 +27,11 @@ Select or put your cursor on a color, then select the format to convert to.
 It's also possible to convert all colors in a document.
 If you run "convert all" with an active selection, only the colors in that selection are converted (this requires a ST build of 4181 or newer).
 
+### Copy as...
+
+A "Copy as hex" command is available in both the context menu and command palette. This converts the selected color to uppercase hexadecimal, with 6 characters (or 8 if there is opacity). This is an "portable" format that allows easy copying of colors across different applications.  
+The "HEX6" format is not one of the default targets, but you can use it in your own  commands or keyboard shortcuts. All the other supported formats can also be used in the `color_convert_copy` command.
+
 ## How to customize
 
 ### Output formats
