@@ -4,6 +4,9 @@
     // Should hexadecimal colors be in short format, e.g. #333?
     "hex_short": true,
 
+    // When copying a color as hex, include the #.
+    "hex_copy_#": true,
+
     // Enable commas in rgb(), hsl(), etc., these are optional in CSS.
     "commas": false,
 

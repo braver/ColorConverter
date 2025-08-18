@@ -148,10 +148,15 @@ def convert(color, format):
 
 
 def pnt_to_clipboard(view, pnt, format):
+    settings = sublime.load_settings('ColorConverter.sublime-settings')
+
     try:
         source = get_cursor_color(view, pnt)
         color = source[1]
         result = convert(color, format)
+        if format == 'hex' or format == 'HEX6' and settings.get('hex_copy_#') is not True:
+            result = re.sub(r'^\#', '', result)
+
         sublime.set_clipboard(result)
         sublime.status_message('Copied {} to the clipboard'.format(result))
     except Exception:
