@@ -163,7 +163,7 @@ def pnt_to_clipboard(view, pnt, format):
         sublime.status_message('That does not seem to be a color')
 
 
-class ColorConvert(sublime_plugin.TextCommand):
+class ColorConvertSelectionCommand(sublime_plugin.TextCommand):
     def run(self, edit, format='rgb'):
         selections = self.view.sel()
         for sel in selections:
@@ -176,7 +176,7 @@ class ColorConvert(sublime_plugin.TextCommand):
                 sublime.status_message('That does not seem to be a color')
 
 
-class ColorConvertAll(sublime_plugin.TextCommand):
+class ColorConvertAllCommand(sublime_plugin.TextCommand):
     def convert_region(self, edit, region, format):
         try:
             source = get_cursor_color(self.view, region.begin())
@@ -209,7 +209,7 @@ class ColorConvertAll(sublime_plugin.TextCommand):
             self.convert_region(edit, region, format)
 
 
-class ContextCommand(sublime_plugin.TextCommand):
+class _ContextCommand(sublime_plugin.TextCommand):
     def find_point(self, event):
         """ Find the clicked point for the context menu """
         if not self.view:
@@ -234,7 +234,7 @@ class ContextCommand(sublime_plugin.TextCommand):
         return True
 
 
-class ContextColorConvert(ContextCommand):
+class ColorConvertContextCommand(_ContextCommand):
     def run(self, edit, format, event=None):
         pnt = self.find_point(event)
         if not pnt:
@@ -254,7 +254,7 @@ class ContextColorConvert(ContextCommand):
             sublime.status_message('That does not seem to be a color')
 
 
-class ContextColorCopy(ContextCommand):
+class ColorConvertCopyContextCommand(_ContextCommand):
     def run(self, edit, format='HEX6', event=None):
         pnt = self.find_point(event)
         if not pnt:
@@ -263,7 +263,7 @@ class ContextColorCopy(ContextCommand):
         pnt_to_clipboard(self.view, pnt, format)
 
 
-class ColorConvertCopy(sublime_plugin.TextCommand):
+class ColorConvertCopyCommand(sublime_plugin.TextCommand):
     def run(self, edit, format='HEX6'):
         selections = self.view.sel()
         pnt_to_clipboard(self.view, selections[0].begin(), format)

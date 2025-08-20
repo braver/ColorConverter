@@ -17,32 +17,32 @@
     },
     {
         "caption": "ColorConverter: Convert to name",
-        "command": "color_convert",
+        "command": "color_convert_selection",
         "args": { "format": "name" }
     },
     {
         "caption": "ColorConverter: Convert to hex",
-        "command": "color_convert",
+        "command": "color_convert_selection",
         "args": { "format": "hex" }
     },
     {
         "caption": "ColorConverter: Convert to rgb",
-        "command": "color_convert",
+        "command": "color_convert_selection",
         "args": { "format": "rgb" }
     },
     {
         "caption": "ColorConverter: Convert to hsl",
-        "command": "color_convert",
+        "command": "color_convert_selection",
         "args": { "format": "hsl" }
     },
     {
         "caption": "ColorConverter: Convert to lab",
-        "command": "color_convert",
+        "command": "color_convert_selection",
         "args": { "format": "lab" }
     },
     {
         "caption": "ColorConverter: Convert to color",
-        "command": "color_convert",
+        "command": "color_convert_selection",
         "args": { "format": "color" }
     },
     {
