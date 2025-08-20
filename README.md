@@ -73,6 +73,8 @@ See also the [official documentation](https://www.sublimetext.com/docs/packages.
 
 This package is built on the [coloraide](https://facelessuser.github.io/coloraide/) library by [Isaac Muse](https://github.com/facelessuser).
 
+It's inspired by the work of [@zhouyuexie](https://github.com/zhouyuexie/ColorConvert), [@TheDutchCoder](https://github.com/TheDutchCoder/ColorConvert), [@atadams](https://github.com/atadams/Hex-to-HSL-Color), [@vitorleal](https://github.com/vitorleal/hex-2-rgb), and [@aroscoe](https://github.com/aroscoe/Hex-to-RGBA), whose color converter packages preceded this one.
+
 ## Buy me a coffee 
 
 ☕️👌🏻

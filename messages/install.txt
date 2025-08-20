@@ -8,3 +8,10 @@ you may have to update your keybindings and settings.
 Please refer to the readme for more information:
 
 https://github.com/braver/ColorConverter
+
+Thanks to the ancestors for their inspiration:
+- https://github.com/zhouyuexie/ColorConvert
+- https://github.com/TheDutchCoder/ColorConvert
+- https://github.com/atadams/Hex-to-HSL-Color
+- https://github.com/vitorleal/hex-2-rgb
+- https://github.com/aroscoe/Hex-to-RGBA
