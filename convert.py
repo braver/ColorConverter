@@ -109,10 +109,10 @@ def convert(color, format):
 
     if format == 'name':
         # caveat: if the color has no name, it will fall back to rgb() probably
-        return color.to_string(names=True)
+        return color.convert('srgb').to_string(names=True)
 
     if format == 'hex':
-        return color.to_string(
+        return color.convert('srgb').to_string(
             hex=True,
             upper=settings.get('hex_case') == 'upper',
             compress=settings.get('hex_short'),
@@ -120,7 +120,7 @@ def convert(color, format):
 
     if format == 'HEX6':
         # "portable" version of hex that's uppercase and not compressed
-        return color.to_string(
+        return color.convert('srgb').to_string(
             hex=True,
             upper=True,
             compress=False,
@@ -136,7 +136,7 @@ def convert(color, format):
 
     if format == 'rgb':
         common_args['percent'] = settings.get('%_rgb')
-        return color.to_string(**common_args)
+        return color.convert('srgb').to_string(**common_args)
 
     if format == 'hsl':
         color.convert('hsl', in_place=True)
