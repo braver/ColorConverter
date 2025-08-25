@@ -11,9 +11,11 @@ import sublime_plugin
 HEX_COLOR_RE = r'([a-f0-9]{6}|[a-f0-9]{3})'
 # relatively naive color function search
 # coloraide doesn't understand the more complex "from green" notations anyway
-RGB_COLOR_RE = r'(rgba?|hsla?|lab|color)\([^)]+\)'
+RGB_COLOR_RE = r'(rgba?|hsla?|hwb|lab|color)\([^)]+\)'
+# coloraide needs the bits of hsl and hwb separately, so these regexes also do some parsing
 ANGLE_RE = r'((?P<none>none)|(?P<deg>[+\-]?[0-9.]+)(?:deg)?|(?P<rad>[+\-]?[0-9.]+)rad|(?P<grad>[+\-]?[0-9.]+)grad|(?P<turn>[+\-]?[0-9.]+)turn)'  # noqa: E501
-HLS_RE = r'hsla?\({},?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)'.format(ANGLE_RE)  # noqa: E501
+HSL_RE = r'hsla?\({},?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)'.format(ANGLE_RE)  # noqa: E501
+HWB_RE = r'hwb?\({},?\s*(?P<white>[0-9.]+)%?,?\s*(?P<black>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)'.format(ANGLE_RE)  # noqa: E501
 
 
 def get_search_region(view, pnt):
@@ -25,8 +27,8 @@ def get_search_region(view, pnt):
     return sublime.Region(start, end)
 
 
-def parse_hsl(match):
-    """ With the regex split out the parts of the h, s, l, a. """
+def parse_hues(match, format):
+    """ With the regex split out the parts of the hsl/hwb. """
     hue = 0
     if match.group('none'):
         hue = 0
@@ -41,8 +43,6 @@ def parse_hsl(match):
     if match.group('turn'):
         # https://developer.mozilla.org/en-US/docs/Web/CSS/angle
         hue = Decimal(match.group('turn')) * 360
-    sat = Decimal(match.group('sat') or 0) / 100
-    light = Decimal(match.group('light') or 0) / 100
 
     opacity = 1
     if match.group('opdec'):
@@ -50,8 +50,19 @@ def parse_hsl(match):
     elif match.group('opperc'):
         opacity = Decimal(match.group('opperc')) / 100
 
-    # create the color object and convert to srgb
-    return Color('hsl', [hue, sat, light], opacity).convert('srgb')
+    if format == 'hsl':
+        sat = Decimal(match.group('sat') or 0) / 100
+        light = Decimal(match.group('light') or 0) / 100
+        # create the color object and convert to srgb
+        return Color('hsl', [hue, sat, light], opacity).convert('srgb')
+
+    if format == 'hwb':
+        white = Decimal(match.group('white') or 0) / 100
+        black = Decimal(match.group('black') or 0) / 100
+        # create the color object and convert to srgb
+        return Color('hwb', [hue, white, black], opacity).convert('srgb')
+
+    return None
 
 
 def find_color_func_at_point(view, pnt):
@@ -60,11 +71,17 @@ def find_color_func_at_point(view, pnt):
 
     relative_cursor_pos = pnt - search_region.a
 
-    for m in re.compile(HLS_RE).finditer(content):
+    for m in re.compile(HSL_RE).finditer(content):
         match_start, match_end = m.span()
         if match_start <= relative_cursor_pos <= match_end:
             match_region = sublime.Region(search_region.a + m.start(), search_region.a + m.end())
-            return (match_region, parse_hsl(m))
+            return (match_region, parse_hues(m, 'hsl'))
+
+    for m in re.compile(HWB_RE).finditer(content):
+        match_start, match_end = m.span()
+        if match_start <= relative_cursor_pos <= match_end:
+            match_region = sublime.Region(search_region.a + m.start(), search_region.a + m.end())
+            return (match_region, parse_hues(m, 'hwb'))
 
     for m in re.compile(RGB_COLOR_RE).finditer(content):
         match_start, match_end = m.span()
