@@ -10,11 +10,11 @@
     // Enable commas in rgb(), hsl(), etc., these are optional in CSS.
     "commas": false,
 
-    // When converting to/from HSL, round percentages to whole numbers.
+    // When converting to/from hsl()/hwb(), round percentages to whole numbers.
     // Disable this to use precision of 5.
     "round": true,
 
-    // Enable % units in color(), hsl(), lab(), these are optional in CSS.
+    // Enable % units in color(), hsl(), hwb(), lab(), these are optional in CSS.
     "%": false,
 
     // Enable % units in rgb(), instead of 0-255.

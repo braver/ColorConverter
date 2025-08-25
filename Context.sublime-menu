@@ -23,6 +23,11 @@
                 "args": { "format": "hsl" }
             },
             {
+                "caption": "hwb",
+                "command": "color_convert_context",
+                "args": { "format": "hwb" }
+            },
+            {
                 "caption": "lab",
                 "command": "color_convert_context",
                 "args": { "format": "lab" }

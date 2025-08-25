@@ -172,6 +172,10 @@ def convert(color, format):
         color.convert('hsl', in_place=True)
         return color.to_string(**common_args)
 
+    if format == 'hwb':
+        color.convert('hwb', in_place=True)
+        return color.to_string(**common_args)
+
     if format == 'lab':
         color.convert('lab', in_place=True)
         return color.to_string(**common_args)

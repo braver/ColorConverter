@@ -36,6 +36,11 @@
         "args": { "format": "hsl" }
     },
     {
+        "caption": "ColorConverter: Convert to hwb",
+        "command": "color_convert_selection",
+        "args": { "format": "hwb" }
+    },
+    {
         "caption": "ColorConverter: Convert to lab",
         "command": "color_convert_selection",
         "args": { "format": "lab" }
