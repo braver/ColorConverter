@@ -2,6 +2,7 @@ from coloraide import Color
 from coloraide.css import color_names
 from decimal import Decimal
 import re
+import math
 import sublime
 import sublime_plugin
 
@@ -11,7 +12,8 @@ HEX_COLOR_RE = r'([a-f0-9]{6}|[a-f0-9]{3})'
 # relatively naive color function search
 # coloraide doesn't understand the more complex "from green" notations anyway
 RGB_COLOR_RE = r'(rgba?|hsla?|lab|color)\([^)]+\)'
-HLS_RE = r'hsla?\(((?P<angle>[0-9.]+)(?:deg)?|(?P<none>none)),?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)'  # noqa: E501
+ANGLE_RE = r'((?P<none>none)|(?P<deg>[+\-]?[0-9.]+)(?:deg)?|(?P<rad>[+\-]?[0-9.]+)rad|(?P<grad>[+\-]?[0-9.]+)grad|(?P<turn>[+\-]?[0-9.]+)turn)'  # noqa: E501
+HLS_RE = r'hsla?\({},?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)'.format(ANGLE_RE)  # noqa: E501
 
 
 def get_search_region(view, pnt):
@@ -26,8 +28,19 @@ def get_search_region(view, pnt):
 def parse_hsl(match):
     """ With the regex split out the parts of the h, s, l, a. """
     hue = 0
-    if not match.group('none'):
-        hue = Decimal(match.group('angle'))
+    if match.group('none'):
+        hue = 0
+    if match.group('deg'):
+        hue = Decimal(match.group('deg'))
+    if match.group('rad'):
+        # https://en.wikipedia.org/wiki/Radian
+        hue = math.degrees(Decimal(match.group('rad')))
+    if match.group('grad'):
+        # https://en.wikipedia.org/wiki/Gradian
+        hue = Decimal(match.group('grad')) * 9 / 10
+    if match.group('turn'):
+        # https://developer.mozilla.org/en-US/docs/Web/CSS/angle
+        hue = Decimal(match.group('turn')) * 360
     sat = Decimal(match.group('sat') or 0) / 100
     light = Decimal(match.group('light') or 0) / 100
 
