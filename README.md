@@ -8,6 +8,7 @@ Any alpha value (opacity) present in the input color is retained in the output.
 - [hexadecimal](https://developer.mozilla.org/en-US/docs/Web/CSS/hex-color)
 - [`rgb()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb)
 - [`hsl()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl)
+- [`hwb()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hwb)
 - [`lab()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/lab)
 - [`color()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color)
 
@@ -52,6 +53,7 @@ The `value` specified here is the target format, which is one of the following:
 - `hex`
 - `rgb`
 - `hsl`
+- `hwb`
 - `lab`
 - `color`
 
