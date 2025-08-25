@@ -16,6 +16,10 @@
         }
     },
     {
+        "caption": "ColorConverter: Convert to…",
+        "command": "color_convert_selection"
+    },
+    {
         "caption": "ColorConverter: Convert to name",
         "command": "color_convert_selection",
         "args": { "format": "name" }

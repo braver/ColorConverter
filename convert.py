@@ -197,8 +197,23 @@ def pnt_to_clipboard(view, pnt, format):
         sublime.status_message('That does not seem to be a color')
 
 
+class FormatInputHandler(sublime_plugin.ListInputHandler):
+    def placeholder(self):
+        return 'Select a format to convert to'
+
+    def list_items(self):
+        return [
+            'color',
+            'hex',
+            'hsl',
+            'lab',
+            'name',
+            'rgb'
+        ]
+
+
 class ColorConvertSelectionCommand(sublime_plugin.TextCommand):
-    def run(self, edit, format='rgb'):
+    def run(self, edit, format):
         selections = self.view.sel()
         for sel in selections:
             try:
@@ -208,6 +223,9 @@ class ColorConvertSelectionCommand(sublime_plugin.TextCommand):
                 self.view.replace(edit, source[0], result)
             except Exception:
                 sublime.status_message('That does not seem to be a color')
+
+    def input(self, args):
+        return FormatInputHandler()
 
 
 class ColorConvertAllCommand(sublime_plugin.TextCommand):
@@ -220,7 +238,7 @@ class ColorConvertAllCommand(sublime_plugin.TextCommand):
         except Exception:
             sublime.status_message('That does not seem to be a color')
 
-    def run(self, edit, format='rgb'):
+    def run(self, edit, format):
         find_args = dict(flags=sublime.FindFlags.IGNORECASE)
 
         selections = self.view.sel()
