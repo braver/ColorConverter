@@ -206,6 +206,7 @@ class FormatInputHandler(sublime_plugin.ListInputHandler):
             'color',
             'hex',
             'hsl',
+            'hwb',
             'lab',
             'name',
             'rgb'
