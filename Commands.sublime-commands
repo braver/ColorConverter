@@ -55,38 +55,7 @@
         "args": { "format": "color" }
     },
     {
-        "caption": "ColorConverter: Convert All to name",
-        "command": "color_convert_all",
-        "args": { "format": "name" }
-    },
-    {
-        "caption": "ColorConverter: Convert All to hex",
-        "command": "color_convert_all",
-        "args": { "format": "hex" }
-    },
-    {
-        "caption": "ColorConverter: Convert All to rgb",
-        "command": "color_convert_all",
-        "args": { "format": "rgb" }
-    },
-    {
-        "caption": "ColorConverter: Convert All to hsl",
-        "command": "color_convert_all",
-        "args": { "format": "hsl" }
-    },
-    {
-        "caption": "ColorConverter: Convert All to lab",
-        "command": "color_convert_all",
-        "args": { "format": "lab" }
-    },
-    {
-        "caption": "ColorConverter: Convert All to color",
-        "command": "color_convert_all",
-        "args": { "format": "color" }
-    },
-    {
-        "caption": "ColorConverter: Copy as hex",
-        "command": "color_convert_copy",
-        "args": { "format": "HEX6" }
-    },
+        "caption": "ColorConverter: Convert All to…",
+        "command": "color_convert_all"
+    }
 ]
