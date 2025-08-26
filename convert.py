@@ -213,6 +213,10 @@ class FormatInputHandler(sublime_plugin.ListInputHandler):
 
 
 class ColorConvertSelectionCommand(sublime_plugin.TextCommand):
+    def input(self, args):
+        if 'format' not in args:
+            return FormatInputHandler()
+
     def run(self, edit, format):
         selections = self.view.sel()
         for sel in selections:
@@ -228,11 +232,12 @@ class ColorConvertSelectionCommand(sublime_plugin.TextCommand):
             except Exception:
                 sublime.status_message('That does not seem to be a color')
 
-    def input(self, args):
-        return FormatInputHandler()
-
 
 class ColorConvertAllCommand(sublime_plugin.TextCommand):
+    def input(self, args):
+        if 'format' not in args:
+            return FormatInputHandler()
+
     def convert_region(self, edit, region, format):
         try:
             source = get_cursor_color(self.view, region.begin())
