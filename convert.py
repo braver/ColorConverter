@@ -197,20 +197,48 @@ def pnt_to_clipboard(view, pnt, format):
         sublime.status_message('That does not seem to be a color')
 
 
+class FormatInputHandler(sublime_plugin.ListInputHandler):
+    def placeholder(self):
+        return 'Select a format to convert to'
+
+    def list_items(self):
+        return [
+            'color',
+            'hex',
+            'hsl',
+            'hwb',
+            'lab',
+            'name',
+            'rgb'
+        ]
+
+
 class ColorConvertSelectionCommand(sublime_plugin.TextCommand):
-    def run(self, edit, format='rgb'):
+    def input(self, args):
+        if 'format' not in args:
+            return FormatInputHandler()
+
+    def run(self, edit, format):
         selections = self.view.sel()
         for sel in selections:
             try:
                 source = get_cursor_color(self.view, sel.begin())
                 color = source[1]
                 result = convert(color, format)
+                if format == 'name' and result.startswith('rgb'):
+                    # coloraide converts to rgb() if there is no name
+                    sublime.status_message('This color does not have a name')
+                    return
                 self.view.replace(edit, source[0], result)
             except Exception:
                 sublime.status_message('That does not seem to be a color')
 
 
 class ColorConvertAllCommand(sublime_plugin.TextCommand):
+    def input(self, args):
+        if 'format' not in args:
+            return FormatInputHandler()
+
     def convert_region(self, edit, region, format):
         try:
             source = get_cursor_color(self.view, region.begin())
@@ -220,7 +248,7 @@ class ColorConvertAllCommand(sublime_plugin.TextCommand):
         except Exception:
             sublime.status_message('That does not seem to be a color')
 
-    def run(self, edit, format='rgb'):
+    def run(self, edit, format):
         find_args = dict(flags=sublime.FindFlags.IGNORECASE)
 
         selections = self.view.sel()

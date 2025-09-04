@@ -1,6 +1,6 @@
 [
   // Copy this to your keybindings to enable the shortcut.
-  // These format values are supported:
-  // name, hex, hexa, color, colora, rgb, rgba, hsl, hsla, lab, laba
-  // { "keys": ["ctrl+alt+c"], "command": "color_convert_selection","args": {"format": "hex"} }
+  // You can also set the "format" arg to specify one of these format values:
+  // color, hex, hsl, hwb, lab, name, rgb
+  // { "keys": ["ctrl+alt+c"], "command": "color_convert_selection" }
 ]
