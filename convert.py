@@ -14,8 +14,8 @@ HEX_COLOR_RE = r'([a-f0-9]{6}|[a-f0-9]{3})'
 RGB_COLOR_RE = r'(rgba?|hsla?|hwb|lab|color)\([^)]+\)'
 # coloraide needs the bits of hsl and hwb separately, so these regexes also do some parsing
 ANGLE_RE = r'((?P<none>none)|(?P<deg>[+\-]?[0-9.]+)(?:deg)?|(?P<rad>[+\-]?[0-9.]+)rad|(?P<grad>[+\-]?[0-9.]+)grad|(?P<turn>[+\-]?[0-9.]+)turn)'  # noqa: E501
-HSL_RE = r'hsla?\({},?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)'.format(ANGLE_RE)  # noqa: E501
-HWB_RE = r'hwb?\({},?\s*(?P<white>[0-9.]+)%?,?\s*(?P<black>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%?|,?\s*(?P<opdec>[0-9.]+))?\)'.format(ANGLE_RE)  # noqa: E501
+HSL_RE = r'hsla?\({},?\s*(?P<sat>[0-9.]+)%?,?\s*(?P<light>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%|,?\s*(?P<opdec>[0-9.]+))?\)'.format(ANGLE_RE)  # noqa: E501
+HWB_RE = r'hwb?\({},?\s*(?P<white>[0-9.]+)%?,?\s*(?P<black>[0-9.]+)%?\s*(\/\s*(?P<opperc>[0-9.]+)%|,?\s*(?P<opdec>[0-9.]+))?\)'.format(ANGLE_RE)  # noqa: E501
 
 
 def get_search_region(view, pnt):
